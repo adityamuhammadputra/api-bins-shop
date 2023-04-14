@@ -11,33 +11,80 @@ use App\Resources\User as ResourcesUser;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller as BaseController;
-use Illuminate\Support\Str;
-
-use Sawirricardo\Midtrans\Laravel\Facades\Midtrans;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends BaseController
 {
 
-    public function craeteOrUpdate(Request $request)
+    public function __construct()
     {
-        $user = User::where('auth', $request->sub)
-                    ->first();
-        if ($user) {
-            return $user;
-        }
-        $user = User::create([
-            'auth' => $request->sub,
-            'email' => $request->email,
-            'name' => $request->name,
-            'avatar' => $request->picture,
-        ]);
-
-        return $user;
+        // $this->middleware('auth:api', ['except' => ['login']]);
     }
+
+    public function login(Request $request)
+    {
+        $user = User::where('email', $request->email)
+                    ->first();
+
+        if ($user) {
+            $user->avatar = $request->picture;
+            $user->save();
+            return $this->tokenLogin();
+        } else {
+            $user = User::create([
+                'g' => $request->sub,
+                'email' => $request->email,
+                'name' => $request->name,
+                'avatar' => $request->picture,
+                'password' => '$2y$10$4RRszGrIP.Bw92mopq7dEuSgOVg.MhGbsogdegPDEvQTqZdZoCJ0G',
+            ]);
+
+            return $this->tokenLogin();
+        }
+    }
+
+    public function tokenLogin()
+    {
+        $credentials = request(['email']);
+        $credentials['password'] = 'password';
+
+        if (! $token = auth()->attempt($credentials)) {
+            return response()->json(['error' => 'Email atau password salah'], 401);
+        }
+        return $this->respondWithToken($token);
+    }
+
+    public function logout()
+    {
+        config(['auth.defaults.guard' => 'api']);
+        auth()->logout();
+        return response()->json(['message' => 'Successfully logged out']);
+    }
+
+
+    protected function respondWithToken($token)
+    {
+
+        $user = auth()->user();
+        $user->setAppends([]); // kl gak gini, banyak atribut yg asumsi web-based (request(), session(), dll)
+
+        return response()->json([
+            'accessToken' => $token,
+            // 'tokenType' => 'bearer',
+            'expiresIn' => auth()->factory()->getTTL() * 600,
+            'user' => auth()->user(),
+        ]);
+    }
+
 
     public function user(Request $request)
     {
-        return $request;
+        return Auth::user();
+        return response()->json(auth());
+
+        return auth();
+        dd(auth());
+        return auth()->user();
     }
 
     public function index(Request $request)

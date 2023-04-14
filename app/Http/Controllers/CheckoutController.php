@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Chart;
-use App\Resources\Cart;
+use App\Models\Transaction;
+use App\Models\TransactionDetail;
+use App\Models\TransactionStatus;
+use App\Resources\Transaction as ResourcesTransaction;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller as BaseController;
@@ -11,18 +13,18 @@ use Illuminate\Routing\Controller as BaseController;
 
 class CheckoutController extends BaseController
 {
-
     public function index(Request $request)
     {
         try {
-            $data = Chart::with('product')
-                    ->where('user_id', $request->header('g'))
-                    ->get();
+            $data = Transaction::with('assetStatus', 'user', 'transactionDetails')
+                        ->where('user_id', userId())
+                        ->orderBy('created_at', 'desc')
+                        ->get();
 
             $response = [
                 'status' => 200,
                 'message' => '',
-                'data' => Cart::collection($data),
+                'data' => ResourcesTransaction::collection($data),
             ];
         }
         catch (\Exception $e) {
@@ -37,25 +39,39 @@ class CheckoutController extends BaseController
 
     public function store(Request $request)
     {
+        $invoice = 'INV' . Carbon::now()->format('YmdHis');
+
+        $itemDetails = [];
+        foreach ($request->product as $key => $value) {
+            $itemDetails [] = [
+                'id' => uuId(),
+                'price' => (int)$value['product']['price'],
+                'quantity' => $value['qty'],
+                'name' => $value['product']['name'],
+            ];
+        }
+
         $midtransClient = \Sawirricardo\Midtrans\Midtrans::make(
             "SB-Mid-server-HgNt5rGnmNKA-blTTc5qkpe1",
             "SB-Mid-client-yZVknAlmsT3Cr3K8",
             false,
-            false,
+            true,
             false
         );
         $snapToken = $midtransClient->snap()->create(new \Sawirricardo\Midtrans\Dto\TransactionDto([
                 'transaction_details' => [
-                    'order_id' => 'INV' . Carbon::now()->format('YmdHis'),
+                    'order_id' => $invoice,
                     'gross_amount' => $request->amount,
                 ],
                 "customer_details" => [
-                    "first_name" => "Syahrul",
-                    "last_name" => "pratama",
-                    "email" => "Syahrul.pra@gmail.com",
-                    "phone" => "08xxxxxxxx"
+                    "first_name" => user()->name,
+                    "phone" => user()->phone,
+                    "billing_address"=> [
+                        "address"=> user()->email,
+                    ],
                 ],
-                "enabled_payments" => ['gopay', 'shopeepay', 'alfamart' ,'indomaret', 'bca_va', 'bri_va', 'bni_va']
+                "item_details" => $itemDetails,
+                "enabled_payments" => ['gopay', 'shopeepay', 'alfamart' ,'indomaret', 'bca_va', 'bri_va', 'bni_va', 'other_va', 'echannel', 'akulaku']
             ]));
 
         $response = [
@@ -71,7 +87,7 @@ class CheckoutController extends BaseController
             "SB-Mid-server-HgNt5rGnmNKA-blTTc5qkpe1",
             "SB-Mid-client-yZVknAlmsT3Cr3K8",
             false,
-            false,
+            true,
             false
         );
 

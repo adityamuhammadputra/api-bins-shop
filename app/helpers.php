@@ -3,9 +3,14 @@
 use Carbon\Carbon;
 use Ramsey\Uuid\Uuid;
 
+function user()
+{
+    return auth()->user();
+}
+
 function userId()
 {
-    return 'a';
+    return auth()->user()->id;
 }
 
 function uuId()

@@ -18,7 +18,7 @@ class ChartController extends BaseController
     {
         try {
             $data = Chart::with('product')
-                    ->where('user_id', $request->header('g'))
+                    ->where('user_id', userId())
                     ->get();
 
             $response = [
@@ -43,17 +43,18 @@ class ChartController extends BaseController
             $data = Product::findOrFail($request->product_id);
 
             $input['id'] = uuId();
-            $input['user_id'] = $request->header('g');
+            $input['user_id'] = userId();
+
             $input['product_id'] = $data->id;
             $input['qty'] = $request->qty ?? 1;
 
-            $check = Chart::where('user_id', $request->header('g'))
+            $check = Chart::where('user_id', userId())
                         ->where('product_id', $data->id)
                         ->first();
             if (!$check) {
                 Chart::create($input);
             } else {
-                Chart::where('user_id', $request->header('g'))
+                Chart::where('user_id', userId())
                         ->where('product_id', $data->id)
                         ->update([
                             'qty' => $check->qty + 1
@@ -107,6 +108,18 @@ class ChartController extends BaseController
 
     public function count(Request $request)
     {
-        return Chart::where('user_id', $request->header('g'))->count();
+        if (user()) {
+            $response = [
+                'status' => 200,
+                'message' => Chart::where('user_id', userId())->count(),
+            ];
+        } else {
+            $response = [
+                'status' => 200,
+                'message' => 0,
+            ];
+        }
+
+        return response()->json($response, $response['status']);
     }
 }

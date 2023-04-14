@@ -23,15 +23,26 @@ use Illuminate\Support\Facades\Response;
 */
 
 Route::prefix('/v1/')->group(function () {
-    Route::post('/auth/login', [UserController::class, 'craeteOrUpdate']);
-    Route::get('/auth/user', [UserController::class, 'user']);
+    Route::prefix('auth')->group(function () {
+        Route::post('login', [UserController::class, 'login']);
 
+        Route::group(['middleware' => 'jwt.verify'], function ($router) {
+            Route::get('user', [UserController::class, 'user']);
+            Route::post('logout', [UserController::class, 'logout']);
+        });
+    });
+
+
+    Route::get('chart-count', [ChartController::class, 'count']);
     Route::resource('product', ProductController::class)->except('create');
     Route::resource('chart', ChartController::class)->except('create', 'show');
-    Route::get('chart-count', [ChartController::class, 'count']);
 
-    Route::post('checkout', [CheckoutController::class, 'store']);
-    Route::get('checkout/{checkout_id}', [CheckoutController::class, 'show']);
+    Route::group(['middleware' => 'jwt.verify'], function ($router) {
+        Route::resource('checkout', CheckoutController::class)->except('create', 'edit');
+        // Route::get('checkout/{checkout_id}', [CheckoutController::class, 'show']);
+        // Route::get('checkout/{checkout_id}', [CheckoutController::class, 'show']);
+    });
+
 
     Route::get('/storage/{fileName}', function ($fileName) {
         if (!Storage::disk('public')->exists($fileName)) {

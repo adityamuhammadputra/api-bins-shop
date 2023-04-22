@@ -3,6 +3,7 @@
 use App\Http\Controllers\ChartController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\UserController;
 
 use Illuminate\Http\Request;
@@ -38,7 +39,8 @@ Route::prefix('/v1/')->group(function () {
     Route::resource('chart', ChartController::class)->except('create', 'show');
 
     Route::group(['middleware' => 'jwt.verify'], function ($router) {
-        Route::resource('checkout', CheckoutController::class)->except('create', 'edit');
+        Route::resource('checkout', CheckoutController::class)->only('store', 'show');
+        Route::resource('order', TransactionController::class)->except('create', 'edit');
         // Route::get('checkout/{checkout_id}', [CheckoutController::class, 'show']);
         // Route::get('checkout/{checkout_id}', [CheckoutController::class, 'show']);
     });

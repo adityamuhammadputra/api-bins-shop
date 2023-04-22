@@ -19,6 +19,13 @@ class Transaction extends JsonResource
             "total" => $this->total,
             "notes" => $this->notes,
             "user_id" => $this->user_id,
+            "transaction_midtrans" => [
+                'order_id' => $this->order_id,
+                'gross_amount' => $this->gross_amount,
+                'status_code' => $this->status_code,
+                'transaction_status' => $this->transaction_status,
+                'payment_type' => $this->payment_type,
+            ],
             "transaction_details" => TransactionDetail::collection($this->transactionDetails),
             "created_at" => $this->created_at,
             "updated_at" => $this->updated_at,

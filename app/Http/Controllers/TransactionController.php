@@ -40,8 +40,7 @@ class TransactionController extends BaseController
     public function store(Request $request)
     {
         try {
-
-            $invoice = 'INV' . Carbon::now()->format('YmdHis');
+            $invoice = $request->midtrans['order_id'];
             $inputTrans = [
                 'id' => uuId(),
                 'user_id' => userId(),
@@ -51,6 +50,12 @@ class TransactionController extends BaseController
                 'price' => $request->amount,
                 'discount' => ($request->discount) ? $request->discount : 0,
                 'total' => ($request->discount) ? $request->amount - $request->amount * $request->discount / 100 : $request->amount,
+                'order_id' => $invoice,
+                'gross_amount' => $request->midtrans['gross_amount'],
+                'status_code' => $request->midtrans['status_code'],
+                'transaction_id' => $request->midtrans['transaction_id'],
+                'transaction_status' => $request->midtrans['transaction_status'],
+                'payment_type' => $request->midtrans['payment_type'],
             ];
 
             Transaction::create($inputTrans);

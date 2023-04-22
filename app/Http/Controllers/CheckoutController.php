@@ -13,43 +13,24 @@ use Illuminate\Routing\Controller as BaseController;
 
 class CheckoutController extends BaseController
 {
-    public function index(Request $request)
-    {
-        try {
-            $data = Transaction::with('assetStatus', 'user', 'transactionDetails')
-                        ->where('user_id', userId())
-                        ->orderBy('created_at', 'desc')
-                        ->get();
-
-            $response = [
-                'status' => 200,
-                'message' => '',
-                'data' => ResourcesTransaction::collection($data),
-            ];
-        }
-        catch (\Exception $e) {
-            $response = [
-                'status' => 503,
-                'message' => $e->getMessage()
-            ];
-        }
-
-        return response()->json($response, $response['status']);
-    }
-
     public function store(Request $request)
     {
         $invoice = 'INV' . Carbon::now()->format('YmdHis');
 
         $itemDetails = [];
+        // $totalDetail = 0;
         foreach ($request->product as $key => $value) {
-            $itemDetails [] = [
-                'id' => uuId(),
-                'price' => (int)$value['product']['price'],
-                'quantity' => $value['qty'],
-                'name' => $value['product']['name'],
-            ];
+            if (isset($value['status']) && $value['status'] == true) {
+                // $totalDetail = (int)$value['product']['price'] * $value['qty'];
+                $itemDetails [] = [
+                    'id' => uuId(),
+                    'price' => (int)$value['product']['price'],
+                    'quantity' => $value['qty'],
+                    'name' => $value['product']['name'],
+                ];
+            }
         }
+
 
         $midtransClient = \Sawirricardo\Midtrans\Midtrans::make(
             "SB-Mid-server-HgNt5rGnmNKA-blTTc5qkpe1",

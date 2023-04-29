@@ -16,6 +16,25 @@ class TransactionController extends BaseController
     public function index(Request $request)
     {
         try {
+            $hasTimeOut = Transaction::where('payment_timeout', '<', Carbon::now())
+                            ->where('user_id', userId())
+                            ->where('status_id', 1);
+
+            if (count($hasTimeOut->get()) > 0) {
+                foreach($hasTimeOut->get() as $val) {
+                    TransactionStatus::create([
+                        'id' => uuId(),
+                        'user_id' => userId(),
+                        'transaction_id' => $val->id,
+                        'status_id' => 11,
+                    ]);
+                }
+            }
+
+            $hasTimeOut->update([
+                'status_id' => 11,
+            ]);
+
             $data = Transaction::with('assetStatus', 'user', 'transactionDetails')
                         ->where('user_id', userId())
                         ->orderBy('created_at', 'desc')
@@ -41,6 +60,18 @@ class TransactionController extends BaseController
     {
         try {
             $invoice = $request->midtrans['order_id'];
+            $paymentType = $request->midtrans['payment_type'];
+
+            $paymentTimeout = Carbon::parse($request->midtrans['transaction_time'])
+                                    ->addHours(23)
+                                    ->addMinutes(59)
+                                    ->format('Y-m-d H:i:s');
+            if (in_array($paymentType, ['qris'])) {
+                $paymentTimeout = Carbon::parse($request->midtrans['transaction_time'])
+                                    ->addMinutes(29)
+                                    ->format('Y-m-d H:i:s');
+            }
+
             $inputTrans = [
                 'id' => uuId(),
                 'user_id' => userId(),
@@ -55,7 +86,10 @@ class TransactionController extends BaseController
                 'status_code' => $request->midtrans['status_code'],
                 'transaction_id' => $request->midtrans['transaction_id'],
                 'transaction_status' => $request->midtrans['transaction_status'],
-                'payment_type' => $request->midtrans['payment_type'],
+                'transaction_time' => $request->midtrans['transaction_time'],
+                'payment_type' => $paymentType,
+                'payment_timeout' => $paymentTimeout,
+                'payment_token' => $request->snapData,
             ];
 
             Transaction::create($inputTrans);

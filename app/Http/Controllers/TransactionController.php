@@ -171,8 +171,20 @@ class TransactionController extends BaseController
          return response()->json($transactionStatus, 200);
     }
 
-    public function saveData($request, $invoice)
+    public function callback(Request $request)
     {
+        $serverKey = 'SB-Mid-server-HgNt5rGnmNKA-blTTc5qkpe1';
+        $hassed = hash('sha512', $request->order_id . $request->status_code . $request->gross_amount . $serverKey);
+        if ($hassed == $request->signature_key) {
+            if (in_array($request->transaction_status, ['capture', 'settlement'])) {
+                $order = Transaction::where('order_id', $request->order_id);
+                $order->update([
+                    'status_id' => 2,
+                    'transaction_status' => 'paid',
+                ]);
+            }
+        }
+
 
     }
 }

@@ -12,10 +12,10 @@ class TransactionStatuses extends JsonResource
         if (in_array($this->id, [10, 11]))
             $color = 'danger';
 
-        if (in_array($this->id, [2, 3, 4]))
+        if (in_array($this->id, [2, 3]))
             $color = 'info';
 
-        if (in_array($this->id, [5]))
+        if (in_array($this->id, [4]))
             $color = 'success';
 
         return [

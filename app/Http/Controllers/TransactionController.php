@@ -6,6 +6,7 @@ use App\Models\Transaction;
 use App\Models\TransactionDetail;
 use App\Models\TransactionStatus;
 use App\Resources\Transaction as ResourcesTransaction;
+use App\Resources\TransactionWithStatus;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller as BaseController;
@@ -156,19 +157,24 @@ class TransactionController extends BaseController
         return response()->json($response, 200);
     }
 
-    public function show($orderId)
+    public function show($order)
     {
-        $midtransClient = \Sawirricardo\Midtrans\Midtrans::make(
-            "SB-Mid-server-HgNt5rGnmNKA-blTTc5qkpe1",
-            "SB-Mid-client-yZVknAlmsT3Cr3K8",
-            false,
-            true,
-            false
-        );
+        $data = Transaction::with('transactionStatuses', 'transactionStatuses.assetStatus')
+                ->where('id', $order)
+                ->firstOrFail();
 
-         $transactionStatus = $midtransClient->payment()->status($orderId);
+        return new TransactionWithStatus($data);
+        // $midtransClient = \Sawirricardo\Midtrans\Midtrans::make(
+        //     "SB-Mid-server-HgNt5rGnmNKA-blTTc5qkpe1",
+        //     "SB-Mid-client-yZVknAlmsT3Cr3K8",
+        //     false,
+        //     true,
+        //     false
+        // );
 
-         return response()->json($transactionStatus, 200);
+        //  $transactionStatus = $midtransClient->payment()->status($orderId);
+
+        //  return response()->json($transactionStatus, 200);
     }
 
     public function callback(Request $request)
@@ -181,6 +187,13 @@ class TransactionController extends BaseController
                 $order->update([
                     'status_id' => 2,
                     'transaction_status' => 'paid',
+                ]);
+
+                TransactionStatus::create([
+                    'id' => uuId(),
+                    'user_id' => userId(),
+                    'transaction_id' => Transaction::where('order_id', $request->order_id)->first()->id,
+                    'status_id' => 2,
                 ]);
             }
         }

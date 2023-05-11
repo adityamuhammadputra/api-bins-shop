@@ -60,10 +60,17 @@ function dateOutputIndo($date, $lc = 'IND')
     }
 }
 
-
 function dateTimeOutput($date)
 {
     if (!$date)
         return '-';
     return Carbon::parse($date)->format('d/m/Y H:i:s');
 }
+
+function dateTimeOutput2($date)
+{
+    if (!$date)
+        return '-';
+    return Carbon::parse($date)->format('d F Y, H:i:s');
+}
+

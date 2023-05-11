@@ -10,7 +10,7 @@ class Transaction extends BaseModel
     protected $keyType = 'string';
     protected $guarded = [];
 
-    protected $with = ['assetStatus'];
+    protected $with = ['assetStatus', 'transactionDetails'];
 
     public function user(): BelongsTo
     {
@@ -25,5 +25,10 @@ class Transaction extends BaseModel
     public function transactionDetails(): HasMany
     {
         return $this->hasMany(TransactionDetail::class);
+    }
+
+    public function transactionStatuses(): HasMany
+    {
+        return $this->hasMany(TransactionStatus::class);
     }
 }

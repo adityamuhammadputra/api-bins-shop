@@ -5,7 +5,7 @@ namespace App\Resources;
 use Carbon\Carbon;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class Transaction extends JsonResource
+class TransactionWithStatus extends JsonResource
 {
     public function toArray($request)
     {
@@ -32,6 +32,7 @@ class Transaction extends JsonResource
                 'payment_token' => $this->payment_token,
             ],
             "transaction_details" => TransactionDetail::collection($this->transactionDetails),
+            "transaction_statuses" => TransactionStatuses::collection($this->transactionStatuses),
             "created_at" => $this->created_at,
             "updated_at" => $this->updated_at,
         ];

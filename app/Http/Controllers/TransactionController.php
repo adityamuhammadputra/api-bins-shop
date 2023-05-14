@@ -164,17 +164,46 @@ class TransactionController extends BaseController
                 ->firstOrFail();
 
         return new TransactionWithStatus($data);
-        // $midtransClient = \Sawirricardo\Midtrans\Midtrans::make(
-        //     "SB-Mid-server-HgNt5rGnmNKA-blTTc5qkpe1",
-        //     "SB-Mid-client-yZVknAlmsT3Cr3K8",
-        //     false,
-        //     true,
-        //     false
-        // );
+    }
 
-        //  $transactionStatus = $midtransClient->payment()->status($orderId);
+    public function update(Request $request, Transaction $order)
+    {
 
-        //  return response()->json($transactionStatus, 200);
+        $type = $request->type;
+        if ($type == 'cancel') {
+            $status = 12; $msg= 'Pesanan berhasil dibatalkan';
+        }
+        if ($type == 'done') {
+            $status = 4; $msg= 'Pesanan berhasil diselesaikan';
+        }
+        if ($type == 'refund') {
+            $status = 9; $msg= 'Refund berhasil diajukan';
+        }
+
+        try{
+            $order->status_id = $status;
+            $order->save();
+
+            TransactionStatus::create([
+                'id' => uuId(),
+                'user_id' => userId(),
+                'transaction_id' => $order->id,
+                'status_id' => $status,
+            ]);
+
+            $response = [
+                'status' => 200,
+                'message' => $msg,
+            ];
+        }
+        catch (\Exception $e) {
+            $response = [
+                'status' => 503,
+                'message' => $e->getMessage()
+            ];
+        }
+
+        return response()->json($response, 200);
     }
 
     public function callback(Request $request)

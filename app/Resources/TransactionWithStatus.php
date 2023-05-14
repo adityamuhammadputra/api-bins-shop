@@ -9,6 +9,9 @@ class TransactionWithStatus extends JsonResource
 {
     public function toArray($request)
     {
+        // $trans = new Transaction($this);
+        // $trans['transaction_statuses'] = TransactionStatuses::collection($this->transactionStatuses);
+        // return $trans;
         return [
             "id" => $this->id,
             "invoice" => $this->invoice,
@@ -18,6 +21,7 @@ class TransactionWithStatus extends JsonResource
             "qty" => $this->qty,
             "discount" => $this->discount,
             "total" => $this->total,
+            "total_rp" => "Rp" . number_format($this->total, 0, ",", "."),
             "notes" => $this->notes,
             "user_id" => $this->user_id,
             "transaction_midtrans" => [

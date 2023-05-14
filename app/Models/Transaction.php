@@ -29,6 +29,6 @@ class Transaction extends BaseModel
 
     public function transactionStatuses(): HasMany
     {
-        return $this->hasMany(TransactionStatus::class);
+        return $this->hasMany(TransactionStatus::class)->orderBy('created_at', 'desc');
     }
 }

@@ -9,7 +9,7 @@ class TransactionStatus extends JsonResource
     public function toArray($request)
     {
         $color = 'warning';
-        if (in_array($this->id, [10, 11]))
+        if (in_array($this->id, [11, 12]))
             $color = 'danger';
 
         if (in_array($this->id, [2, 3]))

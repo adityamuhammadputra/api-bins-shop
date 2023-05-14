@@ -18,6 +18,7 @@ class Transaction extends JsonResource
             "qty" => $this->qty,
             "discount" => $this->discount,
             "total" => $this->total,
+            "total_rp" => "Rp" . number_format($this->total, 0, ",", "."),
             "notes" => $this->notes,
             "user_id" => $this->user_id,
             "transaction_midtrans" => [

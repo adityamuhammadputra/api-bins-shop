@@ -11,7 +11,10 @@ class ProductController extends BaseController
 {
     public function index(Request $request)
     {
-        return ResourcesProduct::collection(Product::with('transactionDetails')->filtered()->paginate(25));
+        $products = Product::filtered()
+                        ->sort()
+                        ->paginate(50);
+        return ResourcesProduct::collection($products);
     }
 
     public function show($slug)

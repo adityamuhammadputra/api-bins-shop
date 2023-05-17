@@ -48,6 +48,24 @@ class Product extends BaseModel
 
     }
 
+    public function scopeSort($query)
+    {
+        if (request('sort')) {
+            if (request('sort') == 1) {
+                $query->orderBy('sold', 'desc');
+                // $query->withCount('transactionDetails')->orderBy('transaction_details_count', 'desc');
+            }
+            if (request('sort') == 2) {
+                $query->orderBy('created_at', 'desc');
+            }
+            if (request('sort') == 3) {
+                $query->orderBy('price', 'asc');
+            }
+            if (request('sort') == 4) {
+                $query->orderBy('price', 'desc');
+            }
+        }
+    }
 
 }
 

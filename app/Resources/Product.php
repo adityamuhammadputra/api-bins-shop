@@ -8,7 +8,6 @@ class Product extends JsonResource
 {
     public function toArray($request)
     {
-        $solds = $this->transactionDetails;
         return [
             "id" => $this->id,
             "name" => $this->name,
@@ -20,8 +19,8 @@ class Product extends JsonResource
             "price_rp" => "Rp" . number_format($this->price, 0, ",", "."),
             "discount" => ($this->discount) ? $this->discount . '%' : null,
             "price_discount" => ($this->discount) ? "Rp" . number_format($this->price - ($this->price * $this->discount / 100), 0, ",", ".") : null,
-            "sold" => count($solds),
-            "rating" => (count($solds) > 0) ? 5 : 0,
+            "sold" => ($this->sold) ? $this->sold : 0,
+            "rating" => ($this->sold > 0) ? 5 : 0,
             "category" => ($this->category) ? $this->category->name : null,
             'file' => ($this->img1) ? url('/api/v1/storage', $this->img1) : url('/api/v1/storage', 'default.png'),
             'files' => $this->files(),

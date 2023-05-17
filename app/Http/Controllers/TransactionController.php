@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Product;
 use App\Models\Transaction;
 use App\Models\TransactionDetail;
 use App\Models\TransactionStatus;
@@ -36,7 +37,7 @@ class TransactionController extends BaseController
                 'status_id' => 11,
             ]);
 
-            $data = Transaction::with('assetStatus', 'user', 'transactionDetails')
+            $data = Transaction::with('assetStatus', 'user', 'transactionDetails', 'transactionDetails.product')
                         ->where('user_id', userId())
                         ->orderBy('created_at', 'desc')
                         ->get();
@@ -103,7 +104,7 @@ class TransactionController extends BaseController
             ]);
 
             $inputTransDetail = [];
-            $itemDetails = [];
+            // $itemDetails = [];
             foreach ($request->product as $key => $value) {
                 if (isset($value['status']) && $value['status'] == true) {
 
@@ -113,12 +114,12 @@ class TransactionController extends BaseController
                         $totalDetail = $totalDetail - $totalDisc;
                     }
 
-                    $itemDetails [] = [
-                        'id' => uuId(),
-                        'price' => (int)$value['product']['price'],
-                        'quantity' => $value['qty'],
-                        'name' => $value['product']['name'],
-                    ];
+                    // $itemDetails [] = [
+                    //     'id' => uuId(),
+                    //     'price' => (int)$value['product']['price'],
+                    //     'quantity' => $value['qty'],
+                    //     'name' => $value['product']['name'],
+                    // ];
 
                     $inputTransDetail[] = [
                         'id' => uuId(),
@@ -135,11 +136,16 @@ class TransactionController extends BaseController
                         'created_at' => Carbon::now(),
                         'updated_at' => Carbon::now(),
                     ];
+
+                    $product = Product::find($value['product']['id']);
+                    $product->sold = isset($product->sold ) ? $product->sold + $value['qty'] : $value['qty'];
+                    $product->save();
                 }
             }
 
             if (count($inputTransDetail) > 0) {
                 TransactionDetail::insert($inputTransDetail);
+
             }
 
             $response = [

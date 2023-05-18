@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use App\Models\Transaction;
 use App\Models\TransactionDetail;
+use App\Models\TransactionRating;
+use App\Models\TransactionRatings;
 use App\Models\TransactionStatus;
 use App\Resources\Transaction as ResourcesTransaction;
 use App\Resources\TransactionWithStatus;
@@ -37,7 +39,7 @@ class TransactionController extends BaseController
                 'status_id' => 11,
             ]);
 
-            $data = Transaction::with('assetStatus', 'user', 'transactionDetails', 'transactionDetails.product')
+            $data = Transaction::with('assetStatus', 'user', 'transactionDetails', 'transactionDetails.product', 'transactionRating')
                         ->where('user_id', userId())
                         ->orderBy('created_at', 'desc')
                         ->get();
@@ -232,7 +234,30 @@ class TransactionController extends BaseController
                 ]);
             }
         }
+    }
 
+    public function rating(Request $request)
+    {
+        try{
+            TransactionRating::create([
+                'id' => uuId(),
+                'user_id' => userId(),
+                'transaction_id' => $request->transaction_id,
+                'rating' => $request->value,
+                'desc' => $request->desc,
+            ]);
 
+            $response = [
+                'status' => 200,
+                'message' => 'Terimakasih, ulasan anda sangat berarti :)',
+            ];
+        }
+        catch (\Exception $e) {
+            $response = [
+                'status' => 503,
+                'message' => $e->getMessage()
+            ];
+        }
+        return response()->json($response, 200);
     }
 }

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Transaction extends BaseModel
 {
@@ -30,5 +31,10 @@ class Transaction extends BaseModel
     public function transactionStatuses(): HasMany
     {
         return $this->hasMany(TransactionStatus::class)->orderBy('created_at', 'desc');
+    }
+
+    public function transactionRating(): HasOne
+    {
+        return $this->hasOne(TransactionRating::class);
     }
 }

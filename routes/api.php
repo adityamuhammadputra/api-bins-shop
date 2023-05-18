@@ -42,6 +42,7 @@ Route::prefix('/v1/')->group(function () {
         Route::resource('checkout', CheckoutController::class)->only('store', 'show');
         Route::resource('order', TransactionController::class)->except('create', 'edit');
         Route::post('order-callback', [TransactionController::class, 'callback']);
+        Route::post('order-rating', [TransactionController::class, 'rating']);
         // Route::get('checkout/{checkout_id}', [CheckoutController::class, 'show']);
         // Route::get('checkout/{checkout_id}', [CheckoutController::class, 'show']);
     });

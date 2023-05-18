@@ -33,7 +33,7 @@ class Product extends BaseModel
         if (request('exclude')) {
             $query->when(request('exclude'), function ($query) {
                 $query->where(function ($query) {
-                    $query->whereNotIn('slug', explode(",",request('exclude')));
+                    $query->whereNotIn('slug', explode(",", request('exclude')));
                 });
             });
         }

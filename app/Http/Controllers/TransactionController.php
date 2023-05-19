@@ -239,13 +239,17 @@ class TransactionController extends BaseController
     public function rating(Request $request)
     {
         try{
-            TransactionRating::create([
-                'id' => uuId(),
-                'user_id' => userId(),
-                'transaction_id' => $request->transaction_id,
-                'rating' => $request->value,
-                'desc' => $request->desc,
-            ]);
+            foreach ($request->order['transaction_details'] as $value) {
+                $data = [
+                    'id' => uuId(),
+                    'user_id' => userId(),
+                    'transaction_id' => $request->transaction_id,
+                    'product_id' => $value['product']['id'],
+                    'rating' => $request->value,
+                    'desc' => $request->desc,
+                ];
+                TransactionRating::create($data);
+            }
 
             $response = [
                 'status' => 200,

@@ -33,8 +33,8 @@ class Transaction extends BaseModel
         return $this->hasMany(TransactionStatus::class)->orderBy('created_at', 'desc');
     }
 
-    public function transactionRating(): HasOne
+    public function ProductRating(): HasOne
     {
-        return $this->hasOne(TransactionRating::class);
+        return $this->hasOne(ProductRating::class);
     }
 }

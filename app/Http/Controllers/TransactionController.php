@@ -5,8 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use App\Models\Transaction;
 use App\Models\TransactionDetail;
-use App\Models\TransactionRating;
-use App\Models\TransactionRatings;
+use App\Models\ProductRating;
+use App\Models\ProductRatings;
 use App\Models\TransactionStatus;
 use App\Resources\Transaction as ResourcesTransaction;
 use App\Resources\TransactionWithStatus;
@@ -39,7 +39,7 @@ class TransactionController extends BaseController
                 'status_id' => 11,
             ]);
 
-            $data = Transaction::with('assetStatus', 'user', 'transactionDetails', 'transactionDetails.product', 'transactionRating')
+            $data = Transaction::with('assetStatus', 'user', 'transactionDetails', 'transactionDetails.product', 'ProductRating')
                         ->where('user_id', userId())
                         ->orderBy('created_at', 'desc')
                         ->get();
@@ -248,7 +248,7 @@ class TransactionController extends BaseController
                     'rating' => $request->value,
                     'desc' => $request->desc,
                 ];
-                TransactionRating::create($data);
+                ProductRating::create($data);
             }
 
             $response = [

@@ -35,7 +35,7 @@ class TransactionWithStatus extends JsonResource
                 'payment_diff' => (Carbon::now() < Carbon::parse($this->payment_timeout)) ? Carbon::parse($this->payment_timeout)->diffInRealMilliseconds(Carbon::now()) : 0,
                 'payment_token' => $this->payment_token,
             ],
-            "transaction_rating" => new TransactionRating($this->transactionRating),
+            "transaction_rating" => new ProductRating($this->ProductRating),
             "transaction_details" => TransactionDetail::collection($this->transactionDetails),
             "transaction_statuses" => TransactionStatuses::collection($this->transactionStatuses),
             "created_at" => $this->created_at,

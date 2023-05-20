@@ -21,6 +21,16 @@ class Product extends BaseModel
         return $this->hasMany(TransactionDetail::class);
     }
 
+    public function productRatings(): HasMany
+    {
+        return $this->hasMany(ProductRating::class);
+    }
+
+    public function productDiscussios(): HasMany
+    {
+        return $this->hasMany(ProductDiscussion::class);
+    }
+
     public function scopeFiltered($query)
     {
         $query->when(request('q'), function ($query) {

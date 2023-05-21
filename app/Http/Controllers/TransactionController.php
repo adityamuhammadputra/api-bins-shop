@@ -106,42 +106,64 @@ class TransactionController extends BaseController
             ]);
 
             $inputTransDetail = [];
-            // $itemDetails = [];
-            foreach ($request->product as $key => $value) {
-                if (isset($value['status']) && $value['status'] == true) {
 
-                    $totalDetail = (int)$value['product']['price'] * $value['qty'];
-                    if ($request->discount) {
-                        $totalDisc = (int)$value['product']['price'] * (int)$value['product']['discount'] / 100;
-                        $totalDetail = $totalDetail - $totalDisc;
+            if ($request->direct) { //for button "beli langsung"
+                $totalDetail = (int)$request->product['price'] * $request->qty;
+                if ($request->discount) {
+                    $totalDisc = (int)$request->product['price'] * (int)$request->product['discount'] / 100;
+                    $totalDetail = $totalDetail - $totalDisc;
+                }
+
+                $inputTransDetail[] = [
+                    'id' => uuId(),
+                    'user_id' => userId(),
+                    'transaction_id' => $inputTrans['id'],
+                    'invoice' => $invoice,
+                    'product_id' => $request->product['id'],
+                    'product_name' => $request->product['name'],
+                    'price' => (int)$request->product['price'],
+                    'qty' => $request->qty,
+                    'discount' => (int)$request->product['discount'],
+                    'total' => $totalDetail,
+                    'created_at' => Carbon::now(),
+                    'updated_at' => Carbon::now(),
+                ];
+
+                $product = Product::find($request->product['id']);
+                $product->sold = isset($product->sold ) ? $product->sold + $request->qty : $request->qty;
+                $product->stock = $product->stock - $request->qty;
+                $product->save();
+            } else {
+                foreach ($request->product as $key => $value) {
+                    if (isset($value['status']) && $value['status'] == true) {
+
+                        $totalDetail = (int)$value['product']['price'] * $value['qty'];
+                        if ($request->discount) {
+                            $totalDisc = (int)$value['product']['price'] * (int)$value['product']['discount'] / 100;
+                            $totalDetail = $totalDetail - $totalDisc;
+                        }
+
+                        $inputTransDetail[] = [
+                            'id' => uuId(),
+                            'user_id' => userId(),
+                            'transaction_id' => $inputTrans['id'],
+                            'invoice' => $invoice,
+                            'product_id' => $value['product']['id'],
+                            'product_name' => $value['product']['name'],
+                            'notes' => $value['notes'],
+                            'price' => (int)$value['product']['price'],
+                            'qty' => $value['qty'],
+                            'discount' => (int)$value['product']['discount'],
+                            'total' => $totalDetail,
+                            'created_at' => Carbon::now(),
+                            'updated_at' => Carbon::now(),
+                        ];
+
+                        $product = Product::find($value['product']['id']);
+                        $product->sold = isset($product->sold ) ? $product->sold + $value['qty'] : $value['qty'];
+                        $product->stock = $product->stock - $value['qty'];
+                        $product->save();
                     }
-
-                    // $itemDetails [] = [
-                    //     'id' => uuId(),
-                    //     'price' => (int)$value['product']['price'],
-                    //     'quantity' => $value['qty'],
-                    //     'name' => $value['product']['name'],
-                    // ];
-
-                    $inputTransDetail[] = [
-                        'id' => uuId(),
-                        'user_id' => userId(),
-                        'transaction_id' => $inputTrans['id'],
-                        'invoice' => $invoice,
-                        'product_id' => $value['product']['id'],
-                        'product_name' => $value['product']['name'],
-                        'notes' => $value['notes'],
-                        'price' => (int)$value['product']['price'],
-                        'qty' => $value['qty'],
-                        'discount' => (int)$value['product']['discount'],
-                        'total' => $totalDetail,
-                        'created_at' => Carbon::now(),
-                        'updated_at' => Carbon::now(),
-                    ];
-
-                    $product = Product::find($value['product']['id']);
-                    $product->sold = isset($product->sold ) ? $product->sold + $value['qty'] : $value['qty'];
-                    $product->save();
                 }
             }
 

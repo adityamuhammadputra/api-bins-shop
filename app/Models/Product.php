@@ -23,12 +23,12 @@ class Product extends BaseModel
 
     public function productRatings(): HasMany
     {
-        return $this->hasMany(ProductRating::class);
+        return $this->hasMany(ProductRating::class)->orderBy('created_at', 'desc');
     }
 
     public function productDiscussios(): HasMany
     {
-        return $this->hasMany(ProductDiscussion::class);
+        return $this->hasMany(ProductDiscussion::class)->whereNull('parent')->orderBy('created_at', 'desc');
     }
 
     public function scopeFiltered($query)

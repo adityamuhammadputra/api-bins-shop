@@ -18,16 +18,25 @@ class CheckoutController extends BaseController
         $invoice = 'INV' . Carbon::now()->format('YmdHis');
 
         $itemDetails = [];
-        // $totalDetail = 0;
-        foreach ($request->product as $key => $value) {
-            if (isset($value['status']) && $value['status'] == true) {
-                // $totalDetail = (int)$value['product']['price'] * $value['qty'];
-                $itemDetails [] = [
-                    'id' => uuId(),
-                    'price' => (int)$value['product']['price'],
-                    'quantity' => $value['qty'],
-                    'name' => $value['product']['name'],
-                ];
+
+        if ($request->direct) { //for button "beli langsung"
+            $itemDetails [] = [
+                'id' => uuId(),
+                'price' => (int)$request->product['price'],
+                'quantity' => $request->qty,
+                'name' => $request->product['name'],
+            ];
+        } else {
+            foreach ($request->product as $key => $value) {
+                if ((isset($value['status']) && $value['status'] == true)) {
+                    // $totalDetail = (int)$value['product']['price'] * $value['qty'];
+                    $itemDetails [] = [
+                        'id' => uuId(),
+                        'price' => (int)$value['product']['price'],
+                        'quantity' => $value['qty'],
+                        'name' => $value['product']['name'],
+                    ];
+                }
             }
         }
 

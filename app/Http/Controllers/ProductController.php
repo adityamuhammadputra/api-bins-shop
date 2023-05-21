@@ -38,7 +38,7 @@ class ProductController extends BaseController
                 'parent' => $request->parent,
                 'user_id' => userId(),
                 'product_id' => $request->product_id,
-                'desc' => $request->desc,
+                'desc' => ($request->desc_key) ? $request->desc_parent[$request->desc_key] : $request->desc,
             ];
             ProductDiscussion::create($data);
 

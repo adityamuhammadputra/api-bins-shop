@@ -9,11 +9,13 @@ class ProductDiscussion extends JsonResource
     public function toArray($request)
     {
         return [
+            "id" => $this->id,
             "parent" => $this->parent,
             "desc" => $this->desc,
             "user" => $this->user,
             "created_at" => $this->created_at,
             "updated_at" => $this->updated_at,
+            "replay" => $this->children,
         ];
     }
 

@@ -12,6 +12,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends BaseController
 {
@@ -36,9 +37,8 @@ class UserController extends BaseController
                 'email' => $request->email,
                 'name' => $request->name,
                 'avatar' => $request->picture,
-                'password' => '$2y$10$4RRszGrIP.Bw92mopq7dEuSgOVg.MhGbsogdegPDEvQTqZdZoCJ0G',
+                'password' => Hash::make('password'),
             ]);
-
             return $this->tokenLogin();
         }
     }
@@ -48,7 +48,7 @@ class UserController extends BaseController
         $credentials = request(['email']);
         $credentials['password'] = 'password';
 
-        if (! $token = auth()->attempt($credentials)) {
+        if (!$token = auth()->attempt($credentials)) {
             return response()->json(['error' => 'Email atau password salah'], 401);
         }
         return $this->respondWithToken($token);

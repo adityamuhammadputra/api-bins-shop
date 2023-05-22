@@ -29,6 +29,7 @@ Route::prefix('/v1/')->group(function () {
 
         Route::group(['middleware' => 'jwt.verify'], function ($router) {
             Route::get('user', [UserController::class, 'user']);
+            Route::patch('user/{user}', [UserController::class, 'update']);
             Route::post('logout', [UserController::class, 'logout']);
         });
     });

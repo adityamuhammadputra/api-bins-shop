@@ -107,4 +107,13 @@ class UserController extends BaseController
 
         return response()->json($response, $response['status']);
     }
+
+    public function update(Request $request, $userId)
+    {
+        $user = User::where('Id', $userId)->firstOrFail();
+        $user->phone = $request->phone;
+        $user->gender = $request->gender;
+        $user->birth = ($request->birth) ? Carbon::parse($request->birth)->addDay(1)->format('Y-m-d') : null;
+        $user->save();
+    }
 }

@@ -12,6 +12,7 @@ class ProductRating extends JsonResource
             "rating" => $this->rating,
             "desc" => $this->desc,
             "user" => $this->user,
+            "product" => new ProductMin($this->product),
             "created_at" => $this->created_at,
             "updated_at" => $this->updated_at,
         ];

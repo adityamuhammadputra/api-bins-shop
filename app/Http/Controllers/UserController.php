@@ -2,11 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Chart;
-use App\Models\Product;
 use App\Models\User;
-use App\Resources\Cart;
-use App\Resources\Product as ResourcesProduct;
 use App\Resources\User as ResourcesUser;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -110,10 +106,25 @@ class UserController extends BaseController
 
     public function update(Request $request, $userId)
     {
-        $user = User::where('Id', $userId)->firstOrFail();
-        $user->phone = $request->phone;
-        $user->gender = $request->gender;
-        $user->birth = ($request->birth) ? Carbon::parse($request->birth)->addDay(1)->format('Y-m-d') : null;
-        $user->save();
+        try {
+            $user = User::where('Id', $userId)->firstOrFail();
+            $user->phone = $request->phone;
+            $user->gender = $request->gender;
+            $user->birth = ($request->birth) ? Carbon::parse($request->birth)->addDay(1)->format('Y-m-d') : null;
+            $user->save();
+
+            $response = [
+                'status' => 200,
+                'message' => 'success',
+                'data' => $user,
+            ];
+        } catch (\Exception $e) {
+            $response = [
+                'status' => 503,
+                'message' => $e->getMessage()
+            ];
+        }
+
+        return response()->json($response, $response['status']);
     }
 }

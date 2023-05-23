@@ -9,6 +9,7 @@ use App\Models\ProductRating;
 use App\Models\ProductRatings;
 use App\Models\TransactionStatus;
 use App\Resources\Transaction as ResourcesTransaction;
+use App\Resources\TransactionRatingProduct;
 use App\Resources\TransactionWithStatus;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -109,7 +110,7 @@ class TransactionController extends BaseController
 
             if ($request->direct) { //for button "beli langsung"
                 $totalDetail = (int)$request->product['price'] * $request->qty;
-                if ($request->discount) {
+                if (isset($request->product['discount'])) {
                     $totalDisc = (int)$request->product['price'] * (int)$request->product['discount'] / 100;
                     $totalDetail = $totalDetail - $totalDisc;
                 }
@@ -134,13 +135,15 @@ class TransactionController extends BaseController
                 $product->stock = $product->stock - $request->qty;
                 $product->save();
             } else {
+
+                // return $request->product;
                 foreach ($request->product as $key => $value) {
                     if (isset($value['status']) && $value['status'] == true) {
 
-                        $totalDetail = (int)$value['product']['price'] * $value['qty'];
-                        if ($request->discount) {
+                        $totalDetail = (int)$value['product']['price'];
+                        if (isset($value['product']['discount'])) {
                             $totalDisc = (int)$value['product']['price'] * (int)$value['product']['discount'] / 100;
-                            $totalDetail = $totalDetail - $totalDisc;
+                            $totalDetail = ($totalDetail - $totalDisc);
                         }
 
                         $inputTransDetail[] = [
@@ -152,9 +155,10 @@ class TransactionController extends BaseController
                             'product_name' => $value['product']['name'],
                             'notes' => $value['notes'],
                             'price' => (int)$value['product']['price'],
+                            'price_discount' => (int)$value['product']['price_final'],
                             'qty' => $value['qty'],
                             'discount' => (int)$value['product']['discount'],
-                            'total' => $totalDetail,
+                            'total' => $totalDetail * $value['qty'],
                             'created_at' => Carbon::now(),
                             'updated_at' => Carbon::now(),
                         ];
@@ -238,27 +242,43 @@ class TransactionController extends BaseController
 
     public function callback(Request $request)
     {
-        $serverKey = 'SB-Mid-server-HgNt5rGnmNKA-blTTc5qkpe1';
-        $hassed = hash('sha512', $request->order_id . $request->status_code . $request->gross_amount . $serverKey);
-        if ($hassed == $request->signature_key) {
-            if (in_array($request->transaction_status, ['capture', 'settlement'])) {
-                $order = Transaction::where('order_id', $request->order_id);
-                $order->update([
-                    'status_id' => 2,
-                    'transaction_status' => 'paid',
-                ]);
+        try {
+            $serverKey = 'SB-Mid-server-HgNt5rGnmNKA-blTTc5qkpe1';
+            $hassed = hash('sha512', $request->order_id . $request->status_code . $request->gross_amount . $serverKey);
+            if ($hassed == $request->signature_key) {
+                if (in_array($request->transaction_status, ['capture', 'settlement'])) {
+                    $order = Transaction::where('order_id', $request->order_id);
+                    $order->update([
+                        'status_id' => 2,
+                        'transaction_status' => 'paid',
+                    ]);
 
-                TransactionStatus::create([
-                    'id' => uuId(),
-                    'user_id' => userId(),
-                    'transaction_id' => Transaction::where('order_id', $request->order_id)->first()->id,
-                    'status_id' => 2,
-                ]);
+                    $transaction = Transaction::where('order_id', $request->order_id)->first();
+                    TransactionStatus::create([
+                        'id' => uuId(),
+                        'user_id' => $transaction->user_id,
+                        'transaction_id' => $transaction->id,
+                        'status_id' => 2,
+                    ]);
+                }
             }
+
+            $response = [
+                'status' => 200,
+                'message' => 'Pesanan dibayar',
+            ];
+        } catch (\Exception $e) {
+            $response = [
+                'status' => 503,
+                'message' => $e->getMessage()
+            ];
         }
+
+        return response()->json($response, 200);
+
     }
 
-    public function rating(Request $request)
+    public function ratingStore(Request $request)
     {
         try{
             foreach ($request->order['transaction_details'] as $value) {
@@ -285,5 +305,30 @@ class TransactionController extends BaseController
             ];
         }
         return response()->json($response, 200);
+    }
+
+    public function ratingGet(Request $request)
+    {
+        try {
+            $data = Transaction::with('user', 'ProductRatings', 'ProductRatings.product')
+                        ->where('user_id', userId())
+                        ->where('status_id', 4)
+                        ->orderBy('created_at', 'desc')
+                        ->get();
+
+            $response = [
+                'status' => 200,
+                'message' => '',
+                'data' => TransactionRatingProduct::collection($data),
+            ];
+        }
+        catch (\Exception $e) {
+            $response = [
+                'status' => 503,
+                'message' => $e->getMessage()
+            ];
+        }
+
+        return response()->json($response, $response['status']);
     }
 }

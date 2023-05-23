@@ -37,4 +37,9 @@ class Transaction extends BaseModel
     {
         return $this->hasOne(ProductRating::class);
     }
+
+    public function ProductRatings(): hasMany
+    {
+        return $this->hasMany(ProductRating::class);
+    }
 }

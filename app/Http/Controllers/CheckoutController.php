@@ -22,17 +22,17 @@ class CheckoutController extends BaseController
         if ($request->direct) { //for button "beli langsung"
             $itemDetails [] = [
                 'id' => uuId(),
-                'price' => (int)$request->product['price'],
+                'price' => (int)$request->product['price_final'],
                 'quantity' => $request->qty,
                 'name' => $request->product['name'],
             ];
         } else {
             foreach ($request->product as $key => $value) {
                 if ((isset($value['status']) && $value['status'] == true)) {
-                    // $totalDetail = (int)$value['product']['price'] * $value['qty'];
+                    // $totalDetail = (int)$value['product']['price_final'] * $value['qty'];
                     $itemDetails [] = [
                         'id' => uuId(),
-                        'price' => (int)$value['product']['price'],
+                        'price' => (int)$value['product']['price_final'],
                         'quantity' => $value['qty'],
                         'name' => $value['product']['name'],
                     ];

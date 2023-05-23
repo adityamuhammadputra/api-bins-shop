@@ -20,4 +20,9 @@ class ProductRating extends BaseModel
     {
         return $this->belongsTo(Transaction::class);
     }
+
+    public function product(): BelongsTo
+    {
+        return $this->belongsTo(Product::class);
+    }
 }

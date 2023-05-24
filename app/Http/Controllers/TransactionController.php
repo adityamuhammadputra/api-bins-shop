@@ -40,7 +40,8 @@ class TransactionController extends BaseController
                 'status_id' => 11,
             ]);
 
-            $data = Transaction::with('assetStatus', 'user', 'transactionDetails', 'transactionDetails.product', 'ProductRating')
+            $data = Transaction::filtered()
+                        ->with('assetStatus', 'user', 'transactionDetails', 'ProductRating')
                         ->where('user_id', userId())
                         ->orderBy('created_at', 'desc')
                         ->get();
@@ -97,6 +98,9 @@ class TransactionController extends BaseController
                 'payment_token' => $request->snapData,
             ];
 
+            // dd($inputTrans);
+
+
             Transaction::create($inputTrans);
 
             TransactionStatus::create([
@@ -109,7 +113,7 @@ class TransactionController extends BaseController
             $inputTransDetail = [];
 
             if ($request->direct) { //for button "beli langsung"
-                $totalDetail = (int)$request->product['price'] * $request->qty;
+                $totalDetail = (int)$request->product['price'];
                 if (isset($request->product['discount'])) {
                     $totalDisc = (int)$request->product['price'] * (int)$request->product['discount'] / 100;
                     $totalDetail = $totalDetail - $totalDisc;
@@ -123,9 +127,10 @@ class TransactionController extends BaseController
                     'product_id' => $request->product['id'],
                     'product_name' => $request->product['name'],
                     'price' => (int)$request->product['price'],
-                    'qty' => $request->qty,
+                    'price_discount' => (int)$request->product['price_final'],
                     'discount' => (int)$request->product['discount'],
-                    'total' => $totalDetail,
+                    'qty' => $request->qty,
+                    'total' => $totalDetail * $request->qty,
                     'created_at' => Carbon::now(),
                     'updated_at' => Carbon::now(),
                 ];

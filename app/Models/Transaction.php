@@ -33,6 +33,11 @@ class Transaction extends BaseModel
         return $this->hasMany(TransactionStatus::class)->orderBy('created_at', 'desc');
     }
 
+    public function transactionRating(): HasMany
+    {
+        return $this->hasMany(ProductRating::class);
+    }
+
     public function ProductRating(): HasOne
     {
         return $this->hasOne(ProductRating::class);
@@ -41,5 +46,22 @@ class Transaction extends BaseModel
     public function ProductRatings(): hasMany
     {
         return $this->hasMany(ProductRating::class);
+    }
+
+
+    public function scopeFiltered($query)
+    {
+        if (request('status')) {
+            $query->whereIn('status_id', explode(",", request('status')));
+        }
+
+        if (request('rating')) {
+            $hasRating = request('rating');
+            if ($hasRating == 1) {
+                $query->whereHas('transactionRating');
+            } else {
+                $query->doesntHave('transactionRating');
+            }
+        }
     }
 }

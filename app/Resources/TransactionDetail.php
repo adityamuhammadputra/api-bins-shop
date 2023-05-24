@@ -23,7 +23,8 @@ class TransactionDetail extends JsonResource
             "total_rp" => "Rp" . number_format($this->total, 0, ",", "."),
             "user_id" => $this->user_id,
             "transaction_id" => $this->transaction_id,
-            "product" => new Product($this->product),
+            "product" => new ProductMin($this->product),
+            // "product" => new Product($this->product),
             "created_at" => $this->created_at,
             "updated_at" => $this->updated_at,
         ];

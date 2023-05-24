@@ -40,6 +40,8 @@ class CheckoutController extends BaseController
             }
         }
 
+        // return $itemDetails
+
 
         $midtransClient = \Sawirricardo\Midtrans\Midtrans::make(
             "SB-Mid-server-HgNt5rGnmNKA-blTTc5qkpe1",

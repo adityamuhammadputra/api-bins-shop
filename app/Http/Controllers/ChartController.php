@@ -62,7 +62,7 @@ class ChartController extends BaseController
             }
             $response = [
                 'status' => 200,
-                'message' => Str::limit($data->name, 12, '...'). " berhasil ditambahkan ke keranjang",
+                'message' => Str::limit($data->name, 20, '...'). " ditambahkan ke keranjang",
             ];
 
         }

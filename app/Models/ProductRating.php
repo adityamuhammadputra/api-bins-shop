@@ -9,7 +9,7 @@ class ProductRating extends BaseModel
     protected $keyType = 'string';
     protected $guarded = [];
 
-    protected $with = ['user'];
+    protected $with = ['user', 'product'];
 
     public function user(): BelongsTo
     {

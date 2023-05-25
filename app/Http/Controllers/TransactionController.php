@@ -312,28 +312,28 @@ class TransactionController extends BaseController
         return response()->json($response, 200);
     }
 
-    public function ratingGet(Request $request)
-    {
-        try {
-            $data = Transaction::with('user', 'ProductRatings', 'ProductRatings.product')
-                        ->where('user_id', userId())
-                        ->where('status_id', 4)
-                        ->orderBy('created_at', 'desc')
-                        ->get();
+    // public function ratingGet(Request $request)
+    // {
+    //     try {
+    //         $data = Transaction::with('user', 'ProductRatings', 'ProductRatings.product')
+    //                     ->where('user_id', userId())
+    //                     ->where('status_id', 4)
+    //                     ->orderBy('created_at', 'desc')
+    //                     ->get();
 
-            $response = [
-                'status' => 200,
-                'message' => '',
-                'data' => TransactionRatingProduct::collection($data),
-            ];
-        }
-        catch (\Exception $e) {
-            $response = [
-                'status' => 503,
-                'message' => $e->getMessage()
-            ];
-        }
+    //         $response = [
+    //             'status' => 200,
+    //             'message' => '',
+    //             'data' => TransactionRatingProduct::collection($data),
+    //         ];
+    //     }
+    //     catch (\Exception $e) {
+    //         $response = [
+    //             'status' => 503,
+    //             'message' => $e->getMessage()
+    //         ];
+    //     }
 
-        return response()->json($response, $response['status']);
-    }
+    //     return response()->json($response, $response['status']);
+    // }
 }

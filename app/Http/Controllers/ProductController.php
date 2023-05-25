@@ -6,7 +6,6 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controller as BaseController;
 
 use App\Models\Product;
-use App\Models\ProductDiscussion;
 use App\Resources\Product as ResourcesProduct;
 
 
@@ -30,29 +29,4 @@ class ProductController extends BaseController
         return new ResourcesProduct($product);
     }
 
-    public function discus(Request $request)
-    {
-        try{
-            $data = [
-                'id' => uuId(),
-                'parent' => $request->parent,
-                'user_id' => userId(),
-                'product_id' => $request->product_id,
-                'desc' => isset($request->desc_key) ? $request->desc_parent[$request->desc_key] : $request->desc,
-            ];
-            ProductDiscussion::create($data);
-
-            $response = [
-                'status' => 200,
-                'message' => 'Diskusi berhasil ditambah',
-            ];
-        }
-        catch (\Exception $e) {
-            $response = [
-                'status' => 503,
-                'message' => $e->getMessage()
-            ];
-        }
-        return response()->json($response, 200);
-    }
 }

@@ -17,6 +17,7 @@ class ProductMin extends JsonResource
             "price_rp" => "Rp" . number_format($this->price, 0, ",", "."),
             "discount" => ($this->discount) ? $this->discount . '%' : null,
             "price_discount" => ($this->discount) ? "Rp" . number_format($this->price - ($this->price * $this->discount / 100), 0, ",", ".") : null,
+            // "price_discount_rp" => "Rp" . number_format($this->price_discount, 0, ",", "."),
             'file' => ($this->img1) ? url('/api/v1/storage', $this->img1) : url('/api/v1/storage', 'default.png'),
             'files' => $this->files(),
         ];

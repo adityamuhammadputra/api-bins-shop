@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ChartController;
 use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\DiscussionController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\UserController;
@@ -37,15 +38,15 @@ Route::prefix('/v1/')->group(function () {
 
     Route::get('chart-count', [ChartController::class, 'count']);
     Route::resource('product', ProductController::class)->except('create');
-    Route::post('product-discus', [ProductController::class, 'discus']);
+    // Route::post('product-discus', [ProductController::class, 'discus']);
     Route::resource('chart', ChartController::class)->except('create', 'show');
 
     Route::group(['middleware' => 'jwt.verify'], function ($router) {
         Route::resource('checkout', CheckoutController::class)->only('store', 'show');
         Route::resource('order', TransactionController::class)->except('create', 'edit');
         Route::post('order-rating', [TransactionController::class, 'ratingStore']);
-        Route::get('rating', [TransactionController::class, 'ratingGet']);
-
+        // Route::get('order-rating', [ProductController::class, 'ratingGet']);
+        Route::resource('discuss', DiscussionController::class);
         // Route::get('checkout/{checkout_id}', [CheckoutController::class, 'show']);
         // Route::get('checkout/{checkout_id}', [CheckoutController::class, 'show']);
     });

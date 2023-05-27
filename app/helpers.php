@@ -1,6 +1,8 @@
 <?php
 
+use App\Mail\SendEmail;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Mail;
 use Ramsey\Uuid\Uuid;
 
 function user()
@@ -74,3 +76,18 @@ function dateTimeOutput2($date)
     return Carbon::parse($date)->format('d F Y, H:i:s');
 }
 
+function sendMail($request = null)
+{
+    $data = [
+        // 'subject' => $request->subject,
+        // 'to' => $request->to,
+        // 'name' => $request->name,
+        // 'invoice' => $request->invoice,
+        // 'status_name' => $request->status_name,
+        // 'status_desc' => $request->status_desc,
+        // 'link' => $request->link,
+        'body' => 'Testing Kirim Email di Santri Koding'
+    ];
+
+    Mail::to('alisadikinsyahrizal@gmail.com')->send(new SendEmail($data));
+}

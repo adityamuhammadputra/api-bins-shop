@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Transaction;
 use App\Models\User;
 use App\Resources\User as ResourcesUser;
 use Carbon\Carbon;
@@ -75,9 +76,13 @@ class UserController extends BaseController
 
     public function user(Request $request)
     {
-        return Auth::user();
+        sendMail();
+        $user = Auth::user();
+        $user->transaction_count = Transaction::where('user_id', userId())
+                                        ->where('status_id', 4)
+                                        ->count();
+        return $user;
         return response()->json(auth());
-
         return auth();
         dd(auth());
         return auth()->user();

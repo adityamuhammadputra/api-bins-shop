@@ -5,6 +5,7 @@ use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\DiscussionController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\TransactionController;
+use App\Http\Controllers\TutorialController;
 use App\Http\Controllers\UserController;
 
 use Illuminate\Http\Request;
@@ -50,6 +51,8 @@ Route::prefix('/v1/')->group(function () {
         // Route::get('checkout/{checkout_id}', [CheckoutController::class, 'show']);
         // Route::get('checkout/{checkout_id}', [CheckoutController::class, 'show']);
     });
+
+    Route::get('tutorial', [TutorialController::class, 'index']);
 
     Route::post('order-callback', [TransactionController::class, 'callback']);
 

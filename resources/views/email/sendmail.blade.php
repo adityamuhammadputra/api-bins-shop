@@ -2,36 +2,37 @@
 
 
 @component('mail::message')
-# INV20230524175505 <span style="float:right;"> Menunggu Pembayaran</span>
+# {{ $data->invoice }} <span style="float:right;"> {{ $data->status_name }}</span>
+<br>
 
-<b>Hallo muhammad aditya </b> <br>Pesanan kamu<br>
+Hai {{ $data->user }}. <b>{{ $data->status_desc }}</b>
 
 @component('mail::panel')
-
 <table style="width: 100%;">
+    @if (isset($data->product) && count($data->product) > 0)
+    @foreach ($data->product as $product)
     <tr>
-        <td> Office 2021 x 1</td>
-        <td style="text-align: right;"> Rp. 115.000</td>
+        <td> {{ $product['product_name'] }} x {{ $product['qty'] }}</td>
+        <td style="text-align: right;"> {{ toRupiah($product['price_discount']) }}</td>
     </tr>
-    <tr>
-        <td> Office 2019 x 2</td>
-        <td style="text-align: right;"> Rp. 100.000</td>
-    </tr>
+    @endforeach
+    @endif
     <tr>
         <td><b>Total Harga</b></td>
-        <td style="text-align: right;"> <b>Rp. 215.000</b></td>
+        <td style="text-align: right;"> <b>{{ $data->price }}</b></td>
     </tr>
+    @if (isset($data->payment_timeout))
+    <tr>
+        <td colspan="2" style="padding-top: 30px;font-size: 14px;"><i>Silahkan lakukan pembayaran sebelum pukul {{ $data->payment_timeout }}</i></td>
+    </tr>
+    @endif
 </table>
 @endcomponent
 
-
-Status Pesanan:<br>
-<b>Pemesanan berhasil, menunggu verifikasi pembayaran</b>
 <br>
-<br>
-Klik tombol lihat pesanan, untuk melihat detail pesanan kamu<br>
+Klik tombol <b>lihat pesanan</b>, untuk melihat detail pesanan kamu<br>
 
-@component('mail::button', ['url' => 'https://bins.shop/order/inv',  'color' => 'red'])
+@component('mail::button', ['url' => 'https://bins.shop/' . $data->link,  'color' => 'red'])
 Lihat Pesanan
 @endcomponent
 

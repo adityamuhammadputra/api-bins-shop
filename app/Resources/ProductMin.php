@@ -14,10 +14,10 @@ class ProductMin extends JsonResource
             "slug" => $this->slug,
             "desc" => $this->desc,
             "price" => $this->price,
-            "price_rp" => "Rp" . number_format($this->price, 0, ",", "."),
+            "price_rp" => toRupiah($this->price),
             "discount" => ($this->discount) ? $this->discount . '%' : null,
-            "price_discount" => ($this->discount) ? "Rp" . number_format($this->price - ($this->price * $this->discount / 100), 0, ",", ".") : null,
-            // "price_discount_rp" => "Rp" . number_format($this->price_discount, 0, ",", "."),
+            "price_discount" => ($this->discount) ? toRupiah($this->price - ($this->price * $this->discount / 100)) : null,
+            // "price_discount_rp" => toRupiah($this->price_discount),
             'file' => ($this->img1) ? url('/api/v1/storage', $this->img1) : url('/api/v1/storage', 'default.png'),
             'files' => $this->files(),
         ];

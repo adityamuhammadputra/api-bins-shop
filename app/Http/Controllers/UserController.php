@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AssetStatus;
 use App\Models\Transaction;
 use App\Models\User;
 use App\Resources\User as ResourcesUser;
@@ -76,7 +77,20 @@ class UserController extends BaseController
 
     public function user(Request $request)
     {
-        sendMail();
+        $assetStatus = AssetStatus::find(1);
+            $dataEmail = (object) [
+                'subject' => "#invoice, assetStatus->name",
+                'to' => user()->email,
+                'invoice' => '$invoice',
+                'user' => user()->name,
+                'price' => toRupiah(10000),
+                'payment_timeout' => Carbon::now(),
+                'status_name' => $assetStatus->name,
+                'status_desc' => $assetStatus->desc_email,
+                'link' => "order/12312312321123",
+            ];
+        sendMail($dataEmail);
+
         $user = Auth::user();
         $user->transaction_count = Transaction::where('user_id', userId())
                                         ->where('status_id', 4)

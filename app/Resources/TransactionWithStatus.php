@@ -17,11 +17,11 @@ class TransactionWithStatus extends JsonResource
             "invoice" => $this->invoice,
             "status" => new TransactionStatus($this->assetStatus),
             "price" => $this->price,
-            "price_rp" => "Rp" . number_format($this->price, 0, ",", "."),
+            "price_rp" => toRupiah($this->price),
             "qty" => $this->qty,
             "discount" => $this->discount,
             "total" => $this->total,
-            "total_rp" => "Rp" . number_format($this->total, 0, ",", "."),
+            "total_rp" => toRupiah($this->total),
             "notes" => $this->notes,
             "user_id" => $this->user_id,
             "transaction_midtrans" => [

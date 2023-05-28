@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AssetStatus;
 use App\Models\Product;
 use App\Models\Transaction;
 use App\Models\TransactionDetail;
 use App\Models\ProductRating;
 use App\Models\ProductRatings;
 use App\Models\TransactionStatus;
+use App\Models\User;
 use App\Resources\Transaction as ResourcesTransaction;
 use App\Resources\TransactionRatingProduct;
 use App\Resources\TransactionWithStatus;
@@ -33,7 +35,22 @@ class TransactionController extends BaseController
                         'transaction_id' => $val->id,
                         'status_id' => 11,
                     ]);
+
+
+                    $assetStatus = AssetStatus::find(11);
+                    $dataEmail = (object) [
+                        'subject' => "#$val->invoice, $assetStatus->name",
+                        'to' => user()->email,
+                        'invoice' => $val->invoice,
+                        'user' => user()->name,
+                        'price' => toRupiah($val->total),
+                        'status_name' => $assetStatus->name,
+                        'status_desc' => $assetStatus->desc_email,
+                        'link' => "order/$val->id",
+                    ];
+                    sendMail($dataEmail);
                 }
+
             }
 
             $hasTimeOut->update([
@@ -78,15 +95,17 @@ class TransactionController extends BaseController
                                     ->format('Y-m-d H:i:s');
             }
 
+            $id = uuId();
+            $total = ($request->discount) ? $request->amount - $request->amount * $request->discount / 100 : $request->amount;
             $inputTrans = [
-                'id' => uuId(),
+                'id' => $id,
                 'user_id' => userId(),
                 'status_id' => 1,
                 'invoice' => $invoice,
                 'qty' => $request->qty,
                 'price' => $request->amount,
                 'discount' => ($request->discount) ? $request->discount : 0,
-                'total' => ($request->discount) ? $request->amount - $request->amount * $request->discount / 100 : $request->amount,
+                'total' => $total,
                 'order_id' => $invoice,
                 'gross_amount' => $request->midtrans['gross_amount'],
                 'status_code' => $request->midtrans['status_code'],
@@ -178,8 +197,22 @@ class TransactionController extends BaseController
 
             if (count($inputTransDetail) > 0) {
                 TransactionDetail::insert($inputTransDetail);
-
             }
+
+            $assetStatus = AssetStatus::find(1);
+            $dataEmail = (object) [
+                'subject' => "#$invoice, $assetStatus->name",
+                'to' => user()->email,
+                'invoice' => $invoice,
+                'user' => user()->name,
+                'product' => $inputTransDetail,
+                'price' => toRupiah($total),
+                'payment_timeout' => dateTimeOutput2($paymentTimeout),
+                'status_name' => $assetStatus->name,
+                'status_desc' => $assetStatus->desc_email,
+                'link' => "order/$id",
+            ];
+            sendMail($dataEmail);
 
             $response = [
                 'status' => 200,
@@ -201,6 +234,30 @@ class TransactionController extends BaseController
         $data = Transaction::with('transactionStatuses', 'transactionStatuses.assetStatus')
                 ->where('id', $order)
                 ->firstOrFail();
+
+        if ($data->payment_timeout < Carbon::now() && $data->status_id == 1) {
+            $data->status_id = 11;
+            $data->save();
+            TransactionStatus::create([
+                'id' => uuId(),
+                'user_id' => userId(),
+                'transaction_id' => $data->id,
+                'status_id' => 11,
+            ]);
+
+            $assetStatus = AssetStatus::find(11);
+            $dataEmail = (object) [
+                'subject' => "#$data->invoice, $assetStatus->name",
+                'to' => user()->email,
+                'invoice' => $data->invoice,
+                'user' => user()->name,
+                'price' => toRupiah($data->total),
+                'status_name' => $assetStatus->name,
+                'status_desc' => $assetStatus->desc_email,
+                'link' => "order/$data->id",
+            ];
+            sendMail($dataEmail);
+        }
 
         return new TransactionWithStatus($data);
     }
@@ -229,6 +286,20 @@ class TransactionController extends BaseController
                 'transaction_id' => $order->id,
                 'status_id' => $status,
             ]);
+
+            $assetStatus = AssetStatus::find($status);
+            $transaction = Transaction::find($order->id);
+            $dataEmail = (object) [
+                'subject' => "#$transaction->invoice, $assetStatus->name",
+                'to' => user()->email,
+                'invoice' => $transaction->invoice,
+                'user' => user()->name,
+                'price' => toRupiah($transaction->total),
+                'status_name' => $assetStatus->name,
+                'status_desc' => $assetStatus->desc_email,
+                'link' => "order/$order->id",
+            ];
+            sendMail($dataEmail);
 
             $response = [
                 'status' => 200,
@@ -265,6 +336,20 @@ class TransactionController extends BaseController
                         'transaction_id' => $transaction->id,
                         'status_id' => 2,
                     ]);
+
+                    $assetStatus = AssetStatus::find(2);
+                    $user = User::where('id', $transaction->user_id)->first();
+                    $dataEmail = (object) [
+                        'subject' => "#$transaction->invoice, $assetStatus->name",
+                        'to' => $user->email,
+                        'invoice' => $transaction->invoice,
+                        'user' => $user->name,
+                        'price' => toRupiah($transaction->total),
+                        'status_name' => $assetStatus->name,
+                        'status_desc' => $assetStatus->desc_email,
+                        'link' => "order/$transaction->id",
+                    ];
+                    sendMail($dataEmail);
                 }
             }
 

@@ -34,7 +34,7 @@ class SendEmail extends Mailable
     public function envelope()
     {
         return new Envelope(
-            subject: 'Test Email',
+            subject: $this->data->subject,
         );
     }
 

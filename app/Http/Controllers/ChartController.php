@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Chart;
 use App\Models\Product;
+use App\Models\Transaction;
 use App\Resources\Cart;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller as BaseController;
@@ -121,5 +122,25 @@ class ChartController extends BaseController
         }
 
         return response()->json($response, $response['status']);
+    }
+
+    public function countNotif(Request $request)
+    {
+        if (user()) {
+            $response = [
+                'status' => 200,
+                'message' => Transaction::filtered()
+                                ->where('user_id', userId())
+                                ->count(),
+            ];
+        } else {
+            $response = [
+                'status' => 200,
+                'message' => 0,
+            ];
+        }
+
+        return response()->json($response, $response['status']);
+
     }
 }

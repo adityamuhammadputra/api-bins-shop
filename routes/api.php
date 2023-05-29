@@ -38,6 +38,8 @@ Route::prefix('/v1/')->group(function () {
 
 
     Route::get('chart-count', [ChartController::class, 'count']);
+    Route::get('notif-count', [ChartController::class, 'countNotif']);
+
     Route::resource('product', ProductController::class)->except('create');
     // Route::post('product-discus', [ProductController::class, 'discus']);
     Route::resource('chart', ChartController::class)->except('create', 'show');

@@ -25,6 +25,10 @@ class UserController extends BaseController
         $user = User::where('email', $request->email)
                     ->first();
 
+        if ($request->admin && $user) {
+            return $this->tokenLoginAdmin();
+        }
+
         if ($user) {
             $user->avatar = $request->picture;
             $user->save();
@@ -52,6 +56,15 @@ class UserController extends BaseController
         return $this->respondWithToken($token);
     }
 
+    public function tokenLoginAdmin()
+    {
+        $credentials = request(['email', 'password']);
+            if (!$token = auth()->attempt($credentials)) {
+                return response()->json(['error' => 'Email atau password salah'], 401);
+            }
+            return $this->respondWithToken($token);
+    }
+
     public function logout()
     {
         config(['auth.defaults.guard' => 'api']);
@@ -77,20 +90,6 @@ class UserController extends BaseController
 
     public function user(Request $request)
     {
-        $assetStatus = AssetStatus::find(1);
-            $dataEmail = (object) [
-                'subject' => "#invoice, assetStatus->name",
-                'to' => user()->email,
-                'invoice' => '$invoice',
-                'user' => user()->name,
-                'price' => toRupiah(10000),
-                'payment_timeout' => Carbon::now(),
-                'status_name' => $assetStatus->name,
-                'status_desc' => $assetStatus->desc_email,
-                'link' => "order/12312312321123",
-            ];
-        sendMail($dataEmail);
-
         $user = Auth::user();
         $user->transaction_count = Transaction::where('user_id', userId())
                                         ->where('status_id', 4)

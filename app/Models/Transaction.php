@@ -15,7 +15,7 @@ class Transaction extends BaseModel
 
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
     public function assetStatus(): BelongsTo
@@ -52,7 +52,33 @@ class Transaction extends BaseModel
     public function scopeFiltered($query)
     {
         if (request('status')) {
-            $query->whereIn('status_id', explode(",", request('status')));
+            if (is_array(request('status'))) {
+                $assetStatus = AssetStatus::pluck('id');
+                $in = [];
+                foreach(request('status') as $key => $val) {
+                    array_push($in, $assetStatus[$val]);
+                }
+                $data = $in;
+            } else {
+                $data = explode(",", request('status'));
+            }
+            $query->whereIn('status_id', $data);
+        }
+
+        if (request('q')) {
+            $query->when(request('q'), function ($query) {
+                $param = '%' . request('q') . '%';
+                $query->where(function($query) use($param){
+                    $query->where('invoice', 'like', $param)
+                    ->orWhereHas('user', function($query) use($param){
+                        $query->where('name', 'like', $param);
+                    })
+                    ->orWhereHas('transactionDetails', function($query) use($param){
+                        $query->where('product_name', 'like', $param);
+                    });
+                });
+
+            });
         }
 
         if (request('rating')) {

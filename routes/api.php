@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Admin\ProductController as AdminProductController;
+use App\Http\Controllers\Admin\TransactionController as AdminTransactionController;
 use App\Http\Controllers\ChartController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\DiscussionController;
@@ -55,7 +57,6 @@ Route::prefix('/v1/')->group(function () {
     });
 
     Route::get('tutorial', [TutorialController::class, 'index']);
-
     Route::post('order-callback', [TransactionController::class, 'callback']);
 
 
@@ -71,6 +72,28 @@ Route::prefix('/v1/')->group(function () {
 
         return $response;
     });
+
+
+
+
+    Route::prefix('/admin/')->group(function () {
+        Route::prefix('auth')->group(function () {
+            Route::post('/login', [UserController::class, 'login']);
+        });
+
+        Route::group(['middleware' => ['jwt.verify']], function ($router) {
+            // Route::resource('transaction', AdminTransactionController::class)->except('create', 'edit');
+            Route::post('transaction', [AdminTransactionController::class, 'index']);
+            Route::patch('transaction/{transaction}', [AdminTransactionController::class, 'update']);
+            Route::get('status', [AdminTransactionController::class, 'status']);
+
+            Route::post('product', [AdminProductController::class, 'store']);
+            Route::post('product-data', [AdminProductController::class, 'index']);
+            Route::patch('product-row/{product}', [AdminProductController::class, 'updateRow']);
+        });
+
+    });
+
 });
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {

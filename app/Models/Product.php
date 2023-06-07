@@ -48,14 +48,11 @@ class Product extends BaseModel
             });
         }
 
-        //for custom datatable
-        if (request('search')) {
-            $query->when(request('search')['value'], function ($query) {
-                $param = '%' . request('search')['value'] . '%';
-                $query->where('name', 'like', $param);
-            });
+        if (request('status')) {
+            if (is_array(request('status'))) {
+                $query->whereIn('status', request('status'));
+            }
         }
-
     }
 
     public function scopeSort($query)

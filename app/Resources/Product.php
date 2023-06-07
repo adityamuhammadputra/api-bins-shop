@@ -29,6 +29,8 @@ class Product extends JsonResource
             "category" => ($this->category) ? $this->category->name : null,
             'file' => ($this->img1) ? url('/api/v1/storage', $this->img1) : url('/api/v1/storage', 'default.png'),
             'files' => $this->files(),
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
         ];
     }
 

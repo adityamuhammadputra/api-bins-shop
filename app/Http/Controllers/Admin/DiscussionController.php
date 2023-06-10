@@ -1,6 +1,7 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
+
 
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller as BaseController;
@@ -13,12 +14,22 @@ class DiscussionController extends BaseController
     public function index(Request $request)
     {
         $data = ProductDiscussion::filtered()
-                    ->where('user_id', userId())
                     ->whereNull('parent')
                     ->orderBy('created_at', 'desc')
                     ->get();
 
-        return ResourcesProductDiscussion::collection($data);
+        if ($request->replay == 2) {
+            foreach ($data as $key => $value) {
+                foreach($value->children as $child) {
+                    if (isset($child->user_id) && $child->user_id == userId()) {
+                        // unset($data[$key]);
+                        $data->forget($key);
+                    }
+                }
+            }
+        }
+
+        return ResourcesProductDiscussion::collection(collect($data));
     }
 
     public function show($slug)
@@ -34,8 +45,9 @@ class DiscussionController extends BaseController
                 'parent' => $request->parent,
                 'user_id' => userId(),
                 'product_id' => $request->product_id,
-                'desc' => isset($request->desc_key) ? $request->desc_parent[$request->desc_key] : $request->desc,
+                'desc' => $request->desc,
             ];
+
             ProductDiscussion::create($data);
 
             $response = [

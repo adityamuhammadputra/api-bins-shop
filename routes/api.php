@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\DiscussionController as AdminDiscussionController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\TransactionController as AdminTransactionController;
 use App\Http\Controllers\ChartController;
@@ -73,9 +74,6 @@ Route::prefix('/v1/')->group(function () {
         return $response;
     });
 
-
-
-
     Route::prefix('/admin/')->group(function () {
         Route::prefix('auth')->group(function () {
             Route::post('/login', [UserController::class, 'login']);
@@ -87,9 +85,16 @@ Route::prefix('/v1/')->group(function () {
             Route::patch('transaction/{transaction}', [AdminTransactionController::class, 'update']);
             Route::get('status', [AdminTransactionController::class, 'status']);
 
-            Route::post('product', [AdminProductController::class, 'store']);
+            // Route::post('product', [AdminProductController::class, 'store']);
+            // Route::patch('product/{slug}', [AdminProductController::class, 'update']);
+            // Route::get('product/{slug}', [AdminProductController::class, 'show']);
+            Route::resource('product', AdminProductController::class)->only('store', 'update', 'show', 'destroy');
             Route::post('product-data', [AdminProductController::class, 'index']);
             Route::patch('product-row/{product}', [AdminProductController::class, 'updateRow']);
+
+            Route::resource('discuss', AdminDiscussionController::class)->only('store', 'show', 'update');
+            Route::post('discuss-data', [AdminDiscussionController::class, 'index']);
+
         });
 
     });

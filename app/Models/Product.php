@@ -52,7 +52,11 @@ class Product extends BaseModel
             if (is_array(request('status'))) {
                 $query->whereIn('status', request('status'));
             }
+        } else {
+            $query->where('status', 1);
         }
+
+        $query->whereNull('deleted_at');
     }
 
     public function scopeSort($query)
@@ -71,6 +75,8 @@ class Product extends BaseModel
             if (request('sort') == 4) {
                 $query->orderBy('price', 'desc');
             }
+        } else {
+            $query->orderBy('updated_at', 'desc');
         }
     }
 

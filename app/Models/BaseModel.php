@@ -28,7 +28,7 @@ abstract class BaseModel extends Model
                 'data' => $this,
             ];
         }
-        return response()->json($response, $response['code']);
+        return response()->json($response, $response['status']);
     }
 
     public function scopeMyData($query)

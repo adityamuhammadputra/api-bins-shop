@@ -6,7 +6,8 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controller as BaseController;
 
 use App\Models\Product;
-use App\Resources\Product as ResourcesProduct;
+use App\Resources\ProductMin as ResourcesProduct;
+use App\Resources\ProductMin;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -25,33 +26,11 @@ class ProductController extends BaseController
 
     public function show($slug)
     {
-        $product = Product::with('productRatings', 'productDiscussios')
-                        ->where('slug', $slug)
+        $product = Product::where('slug', $slug)
                         ->firstOrFail();
-        return new ResourcesProduct($product);
+        return new ProductMin($product);
     }
 
-    public function updateRow(Request $request, Product $product)
-    {
-        try {
-            $product->stock = $request->stock;
-            $product->status = $request->status;
-
-            $product->save();
-            $response = [
-                'status' => 200,
-                'message' => $product->Name . ' Produk diupdate'
-            ];
-        }
-        catch (\Exception $e) {
-            $response = [
-                'status' => 503,
-                'message' => $e->getMessage()
-            ];
-        }
-        return response()->json($response, $response['status']);
-
-    }
 
     public function store(Request $request)
     {
@@ -73,15 +52,45 @@ class ProductController extends BaseController
         return response()->json($response, $response['status']);
     }
 
+    public function update(Request $request, $slug)
+    {
+        // return collect($request)->except('_method');
+        try {
+            $input = $this->inputData($request, true);
+            Product::where('slug', $slug)
+                    ->update($input);
+
+            $response = [
+                'status' => 200,
+                'message' => $request->name . ' berhasil diperbaharui'
+            ];
+        }
+        catch (\Exception $e) {
+            $response = [
+                'status' => 503,
+                'message' => $e->getMessage()
+            ];
+        }
+
+        return response()->json($response, $response['status']);
+    }
+
+    public function destroy(Product $product)
+    {
+        return $product->trashed();
+    }
 
     public function inputData($request, $update = false)
     {
-        $arrImg = ['img1', 'img2', 'img3', 'img4', 'img5'];
-        $input = $request->except($arrImg);
+        $arrExcept = ['_method', 'price_rp', 'file', 'files', 'price_discount', 'discount', 'price_final_rp', 'created_at', 'updated_at'];
+        $input = $request->except($arrExcept);
         $input['price'] = str_replace('.', '', $request->price);
         $input['slug'] = Str::slug($request->name);
+        $arrImg = ['img1', 'img2', 'img3', 'img4', 'img5'];
         foreach ($arrImg as $img) {
-            $input[$img] = $this->inputFile($request, $img);
+            if ($request->{$img}) {
+                $input[$img] = $this->inputFile($request, $img);
+            }
         }
 
         if ($update == false) {
@@ -102,6 +111,29 @@ class ProductController extends BaseController
         }
 
         return null;
+    }
+
+    public function updateRow(Request $request, Product $product)
+    {
+        try {
+            $product->stock = $request->stock;
+            $product->status = $request->status;
+            $product->discount = str_replace('%', '', $request->discount);
+
+            $product->save();
+            $response = [
+                'status' => 200,
+                'message' => $product->Name . ' Produk diupdate'
+            ];
+        }
+        catch (\Exception $e) {
+            $response = [
+                'status' => 503,
+                'message' => $e->getMessage()
+            ];
+        }
+        return response()->json($response, $response['status']);
+
     }
 
 }

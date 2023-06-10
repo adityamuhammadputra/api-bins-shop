@@ -13,7 +13,7 @@ class ProductController extends BaseController
 {
     public function index(Request $request)
     {
-        $products = Product::with('productRatings')
+        $products = Product::with('productRatings', 'productDiscussios')
                         ->filtered()
                         ->sort()
                         ->paginate(50);
@@ -26,6 +26,8 @@ class ProductController extends BaseController
         $product = Product::with('productRatings', 'productDiscussios')
                         ->where('slug', $slug)
                         ->firstOrFail();
+        $product->seen = $product->seen + 1;
+        $product->save();
         return new ResourcesProduct($product);
     }
 

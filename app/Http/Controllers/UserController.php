@@ -6,6 +6,7 @@ use App\Models\AssetStatus;
 use App\Models\Transaction;
 use App\Models\User;
 use App\Resources\User as ResourcesUser;
+use App\Resources\UserTransaction;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller as BaseController;
@@ -108,12 +109,13 @@ class UserController extends BaseController
     public function index(Request $request)
     {
         try {
-            $data = User::paginate();
+            $data = User::with('transactionSuccess')
+                        ->filtered()
+                        ->paginate(50);
 
             $response = [
                 'status' => 200,
-                'message' => 'success',
-                'data' => ResourcesUser::collection($data),
+                'data' => UserTransaction::collection($data),
             ];
         }
         catch (\Exception $e) {

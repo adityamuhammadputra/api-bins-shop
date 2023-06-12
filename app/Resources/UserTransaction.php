@@ -4,7 +4,7 @@ namespace App\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class User extends JsonResource
+class UserTransaction extends JsonResource
 {
     public function toArray($request)
     {
@@ -16,6 +16,9 @@ class User extends JsonResource
             "avatar" => $this->avatar,
             "admin" => ($this->admin) ? true : false,
             "created_at" => $this->created_at,
+            // "transactions" => $this->transactionSuccess,
+            "transaction_success_total" => count($this->transactionSuccess),
+            "transaction_success_total_price" => toRupiah($this->transactionSuccess->sum('total')),
         ];
     }
 

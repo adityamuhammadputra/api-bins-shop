@@ -98,6 +98,8 @@ Route::prefix('/v1/')->group(function () {
             Route::resource('discuss', AdminDiscussionController::class)->only('store', 'show', 'update');
             Route::post('discuss-data', [AdminDiscussionController::class, 'index']);
 
+            Route::post('user-data', [UserController::class, 'index']);
+
         });
 
     });

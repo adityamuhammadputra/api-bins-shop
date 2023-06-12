@@ -63,6 +63,33 @@ class User extends Authenticatable implements JWTSubject
 
     public function transactions(): HasMany
     {
-        return $this->HasMany(Transaction::class);
+        return $this->HasMany(Transaction::class, 'user_id', 'id');
     }
+
+    public function transactionSuccess(): HasMany
+    {
+        return $this->HasMany(Transaction::class, 'user_id', 'id')->where('status_id', 4);
+    }
+
+
+    public function scopeFiltered($query)
+    {
+        if (request('admin')) {
+            if (request('admin') == 1) {
+                $query->where('admin', 1);
+            } else {
+                $query->whereNull('admin');
+            }
+        }
+
+        $query->when(request('q'), function ($query) {
+            $query->where(function ($query) {
+                $param = '%' . request('q') . '%';
+                $query->where('name', 'like', $param)
+                    ->orWhere('email', 'like', $param)
+                    ->orWhere('phone', 'like', $param);
+            });
+        });
+    }
+
 }

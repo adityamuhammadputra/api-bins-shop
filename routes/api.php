@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\DiscussionController as AdminDiscussionController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\TransactionController as AdminTransactionController;
@@ -81,6 +82,8 @@ Route::prefix('/v1/')->group(function () {
 
         Route::group(['middleware' => ['jwt.verify']], function ($router) {
             // Route::resource('transaction', AdminTransactionController::class)->except('create', 'edit');
+            Route::post('dashboard', [DashboardController::class, 'index']);
+
             Route::post('transaction', [AdminTransactionController::class, 'index']);
             Route::patch('transaction/{transaction}', [AdminTransactionController::class, 'update']);
             Route::get('status', [AdminTransactionController::class, 'status']);

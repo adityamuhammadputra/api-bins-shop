@@ -25,8 +25,12 @@ class UserController extends BaseController
         $user = User::where('email', $request->email)
                     ->first();
 
-        if ($request->admin && $user) {
-            return $this->tokenLoginAdmin();
+        if ($request->admin) {
+            if ($user->admin == 1) {
+                return $this->tokenLoginAdmin();
+            } else {
+                return response()->json(['error' => 'Halaman ini hanya untuk admin'], 401);
+            }
         }
 
         if ($user) {

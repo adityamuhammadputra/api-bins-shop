@@ -11,7 +11,7 @@ use App\Resources\ProductDiscussion as ResourcesProductDiscussion;
 
 class DiscussionController extends BaseController
 {
-    public function index(Request $request)
+    public function index(Request $request, $returnCount = false)
     {
         $data = ProductDiscussion::filtered()
                     ->whereNull('parent')
@@ -27,6 +27,10 @@ class DiscussionController extends BaseController
                     }
                 }
             }
+        }
+
+        if ($returnCount) {
+            return count($data);
         }
 
         return ResourcesProductDiscussion::collection(collect($data));

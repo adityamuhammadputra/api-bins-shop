@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Models\Chart;
 use App\Models\ProductSeen;
 use App\Models\Transaction;
+use App\Models\UserLog;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller as BaseController;
@@ -158,6 +159,12 @@ class DashboardController extends BaseController
                 'categories' => $categories,
                 'series' => $series,
             ],
+            'row4' => [
+                'logs' => UserLog::with('user')
+                                ->whereDate('created_at', Carbon::now())->limit(50)
+                                ->orderBy('created_at', 'desc')
+                                ->get(),
+            ]
         ];
 
         return response()->json($response, 200);

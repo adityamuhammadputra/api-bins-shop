@@ -28,6 +28,7 @@ class ProductController extends BaseController
                         ->where('slug', $slug)
                         ->firstOrFail();
 
+
         if (user()) {
             $productSeen = ProductSeen::where('product_id', $product->id)
                                 ->where('user_id', userId())
@@ -42,6 +43,8 @@ class ProductController extends BaseController
                 ]);
             }
         }
+
+        userCreateLog("Has Visit Product $product->id");
 
         return new ResourcesProduct($product);
     }

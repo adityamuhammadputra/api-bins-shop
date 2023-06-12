@@ -38,6 +38,8 @@ class DiscussionController extends BaseController
             ];
             ProductDiscussion::create($data);
 
+            userCreateLog("Has Add Discussion Product $request->product_id");
+
             $response = [
                 'status' => 200,
                 'message' => 'Diskusi berhasil ditambah',

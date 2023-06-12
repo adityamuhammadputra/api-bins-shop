@@ -218,6 +218,9 @@ class TransactionController extends BaseController
                 'status' => 200,
                 'message' => 'Pesanan berhasil dibuat',
             ];
+
+            userCreateLog("Has Order $invoice");
+
         }
         catch (\Exception $e) {
             $response = [
@@ -300,6 +303,7 @@ class TransactionController extends BaseController
                 'link' => "order/$order->id",
             ];
             sendMail($dataEmail);
+            userCreateLog("Has Order Update $transaction->invoice");
 
             $response = [
                 'status' => 200,
@@ -350,6 +354,9 @@ class TransactionController extends BaseController
                         'link' => "order/$transaction->id",
                     ];
                     sendMail($dataEmail);
+
+                    userCreateLog("Has Order Pay $transaction->invoice");
+
                 }
             }
 

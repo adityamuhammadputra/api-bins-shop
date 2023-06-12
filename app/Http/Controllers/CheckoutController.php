@@ -15,6 +15,7 @@ class CheckoutController extends BaseController
 {
     public function store(Request $request)
     {
+
         $invoice = 'INV' . Carbon::now()->format('YmdHis');
 
         $itemDetails = [];
@@ -41,7 +42,7 @@ class CheckoutController extends BaseController
         }
 
         // return $itemDetails
-
+        userCreateLog("Has Order $invoice");
 
         $midtransClient = \Sawirricardo\Midtrans\Midtrans::make(
             "SB-Mid-server-HgNt5rGnmNKA-blTTc5qkpe1",

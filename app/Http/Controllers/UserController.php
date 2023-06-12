@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\AssetStatus;
 use App\Models\Transaction;
 use App\Models\User;
+use App\Models\UserLog;
 use App\Resources\User as ResourcesUser;
 use App\Resources\UserTransaction;
 use Carbon\Carbon;
@@ -74,6 +75,8 @@ class UserController extends BaseController
     {
         config(['auth.defaults.guard' => 'api']);
         auth()->logout();
+
+        userCreateLog('Has Logout');
         return response()->json(['message' => 'Successfully logged out']);
     }
 
@@ -84,14 +87,16 @@ class UserController extends BaseController
         $user = auth()->user();
         $user->setAppends([]); // kl gak gini, banyak atribut yg asumsi web-based (request(), session(), dll)
 
+
+        userCreateLog('Has Login');
+
         return response()->json([
             'accessToken' => $token,
             // 'tokenType' => 'bearer',
             'expiresIn' => auth()->factory()->getTTL() * 600,
-            'user' => auth()->user(),
+            'user' => $user,
         ]);
     }
-
 
     public function user(Request $request)
     {
@@ -99,6 +104,8 @@ class UserController extends BaseController
         $user->transaction_count = Transaction::where('user_id', userId())
                                         ->where('status_id', 4)
                                         ->count();
+
+        userCreateLog('Has Visit Profile');
         return $user;
         return response()->json(auth());
         return auth();
@@ -108,6 +115,7 @@ class UserController extends BaseController
 
     public function index(Request $request)
     {
+
         try {
             $data = User::with('transactionSuccess')
                         ->filtered()

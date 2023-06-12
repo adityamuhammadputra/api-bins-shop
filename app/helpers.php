@@ -1,6 +1,7 @@
 <?php
 
 use App\Mail\SendEmail;
+use App\Models\UserLog;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Mail;
 use Ramsey\Uuid\Uuid;
@@ -93,4 +94,19 @@ function toRupiah($val)
 function sendMail($data)
 {
     Mail::to($data->to)->send(new SendEmail($data));
+}
+
+
+function userCreateLog($desc)
+{
+    $data = [
+        'id' => uuId(),
+        'user_id' => (user()) ? userId() : null,
+        'url' => request()->url(),
+        'method' => request()->method(),
+        'desc' => $desc,
+        'ip_address' => $_SERVER['REMOTE_HOST'],
+    ];
+
+    UserLog::create($data);
 }

@@ -66,6 +66,8 @@ class ChartController extends BaseController
                 'message' => Str::limit($data->name, 20, '...'). " ditambahkan ke keranjang",
             ];
 
+            userCreateLog('Has Add Cart');
+
         }
         catch (\Exception $e) {
             $response = [
@@ -96,6 +98,8 @@ class ChartController extends BaseController
                 'status' => 200,
                 'message' => Str::limit($data->name, 12, '...'). " berhasil dihapus",
             ];
+
+            userCreateLog('Has Remove Cart');
         }
         catch (\Exception $e) {
             $response = [

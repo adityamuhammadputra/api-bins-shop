@@ -20,12 +20,16 @@ class DiscussionController extends BaseController
 
         if ($request->replay == 2) {
             foreach ($data as $key => $value) {
-                foreach($value->children as $child) {
-                    if (isset($child->user_id) && $child->user_id == userId()) {
-                        // unset($data[$key]);
-                        $data->forget($key);
-                    }
+                // dd($value->children->last()->user_id);
+                if (isset($value->children->last()->user_id) && $value->children->last()->user_id == userId()) {
+                    $data->forget($key);
                 }
+                // foreach($value->children as $child) {
+                //     if (isset($child->user_id) && $child->user_id == userId()) {
+                //         // unset($data[$key]);
+                //         $data->forget($key);
+                //     }
+                // }
             }
         }
 

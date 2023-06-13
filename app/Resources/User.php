@@ -15,6 +15,7 @@ class User extends JsonResource
             "phone" => $this->phone,
             "avatar" => $this->avatar,
             "admin" => ($this->admin) ? true : false,
+            "last_seen" => $this->last_seen,
             "created_at" => $this->created_at,
         ];
     }

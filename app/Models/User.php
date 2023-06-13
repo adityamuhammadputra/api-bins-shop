@@ -22,6 +22,7 @@ class User extends Authenticatable implements JWTSubject
         'auth',
         'avatar',
         'password',
+        'last_seen',
     ];
 
     protected $primaryKey = 'email';
@@ -50,6 +51,7 @@ class User extends Authenticatable implements JWTSubject
         'remember_token',
         'last_ip',
         'status',
+        // 'admin',
     ];
 
     /**

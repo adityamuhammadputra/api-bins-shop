@@ -5,11 +5,12 @@ namespace App\Http\Controllers\Admin;
 use App\Models\Chart;
 use App\Models\ProductSeen;
 use App\Models\Transaction;
+use App\Models\User;
 use App\Models\UserLog;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller as BaseController;
-
+use Illuminate\Support\Facades\DB;
 
 class DashboardController extends BaseController
 {
@@ -115,43 +116,129 @@ class DashboardController extends BaseController
             ],
         ];
 
+        // row 3 start
+        $keyTime = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23];
+        $categories = ['00', '01', '02', '03', '04', '05', '06', '07', '08', '09', 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23];
+
+        $productSeen = DB::table('product_seens')
+                        ->select(DB::raw('hour(created_at) as jam'), DB::raw('COUNT(id) as total'))
+                        ->whereDate('created_at', Carbon::now())
+                        ->groupBy(DB::raw('hour(created_at)'))
+                        ->get()
+                        ->pluck('total', 'jam')
+                        ->toArray();
+
+        $productCart = DB::table('charts')
+                        ->select(DB::raw('hour(created_at) as jam'), DB::raw('COUNT(id) as total'))
+                        ->whereDate('created_at', Carbon::now())
+                        ->groupBy(DB::raw('hour(created_at)'))
+                        ->get()
+                        ->pluck('total', 'jam')
+                        ->toArray();
+
+        $productTransaction = DB::table('transactions')
+                        ->select(DB::raw('hour(created_at) as jam'), DB::raw('SUM(qty) as total'))
+                        ->whereDate('created_at', Carbon::now())
+                        ->whereIn('status_id', [2, 3, 4])
+                        ->groupBy(DB::raw('hour(created_at)'))
+                        ->get()
+                        ->pluck('total', 'jam')
+                        ->toArray();
+
+        $productTransactionPrice = DB::table('transactions')
+                        ->select(DB::raw('hour(created_at) as jam'), DB::raw('SUM(total) as total'))
+                        ->whereDate('created_at', Carbon::now())
+                        ->whereIn('status_id', [2, 3, 4])
+                        ->groupBy(DB::raw('hour(created_at)'))
+                        ->get()
+                        ->pluck('total', 'jam')
+                        ->toArray();
+
+        $seriesProductSeen = [];
+        foreach ($keyTime as $time) {
+            if (in_array($time, array_keys($productSeen))) {
+                array_push($seriesProductSeen, $productSeen[$time]);
+            } else {
+                array_push($seriesProductSeen, 0);
+            }
+        }
+
+
+        $seriesProductCart = [];
+        foreach ($keyTime as $time) {
+            if (in_array($time, array_keys($productCart))) {
+                array_push($seriesProductCart, $productCart[$time]);
+            } else {
+                array_push($seriesProductCart, 0);
+            }
+        }
+
+        $seriesProductTransaction = [];
+        foreach ($keyTime as $time) {
+            if (in_array($time, array_keys($productTransaction))) {
+                array_push($seriesProductTransaction, $productTransaction[$time]);
+            } else {
+                array_push($seriesProductTransaction, 0);
+            }
+        }
+
+        // $seriesProductTransactionPrice = [];
+        // foreach ($keyTime as $time) {
+        //     if (in_array($time, array_keys($productTransactionPrice))) {
+        //         array_push($seriesProductTransactionPrice, $productTransactionPrice[$time]);
+        //     } else {
+        //         array_push($seriesProductTransactionPrice, 0);
+        //     }
+        // }
+
+        // return $seriesProductTransaction;
+
+
         $series = [
             [
                 'name' => $labels[0],
-                'data' => [45, 52, 38, 24, 33, 26, 0, 0],
+                'data' => $seriesProductSeen,
             ],
             [
                 'name' => $labels[1],
-                'data' => [45, 21, 22, 20, 30, 16, 0, 0],
+                'data' => $seriesProductCart,
             ],
             [
                 'name' => $labels[2],
-                'data' => [35, 41, 62, 42, 13, 18, 0, 0],
+                'data' => $seriesProductTransaction,
             ],
-            [
-                'name' => $labels[3],
-                'data' => [87, 57, 74, 99, 75, 38, 0, 0],
-            ],
+            // [
+            //     'name' => $labels[3],
+            //     'data' => $seriesProductTransactionPrice,
+            // ],
         ];
 
-        $categories = ['00-03', '03-06', '06-09', '09-12', '12-15', '15-18', '18-21', '21-24'];
+        // return Carbon::now()->subMinutes(2);
 
+        $row3 = [
+            'colors' => $colors,
+            'labels' => $labels,
+            'categories' => $categories,
+            'series' => $series,
+        ];
         $response = [
             'row1' => $row1,
             'row2' => $row2,
-            'row3' => [
-                'colors' => $colors,
-                'labels' => $labels,
-                'categories' => $categories,
-                'series' => $series,
-            ],
+            'row3' => $row3,
             'row4' => [
                 'logs' => UserLog::with('user')
                                 ->whereDate('created_at', Carbon::now())->limit(50)
                                 ->orderBy('created_at', 'desc')
                                 ->get(),
+
+                'user_online' => User::whereNull('admin')
+                                    ->whereNotNull('last_seen')
+                                    ->where('last_seen', '>=', Carbon::now()->subMinutes(2))
+                                    ->get(),
             ]
         ];
+
+
 
         return response()->json($response, 200);
     }

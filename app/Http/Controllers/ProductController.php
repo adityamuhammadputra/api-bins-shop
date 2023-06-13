@@ -28,20 +28,24 @@ class ProductController extends BaseController
                         ->where('slug', $slug)
                         ->firstOrFail();
 
-
+        $userId = null;
         if (user()) {
-            $productSeen = ProductSeen::where('product_id', $product->id)
-                                ->where('user_id', userId())
+            $userId = userId();
+        }
+
+        $productSeen = ProductSeen::where('product_id', $product->id)
+                                ->where('user_id', $userId)
+                                ->where('ip_address', $_SERVER['REMOTE_HOST'])
                                 ->whereDate('created_at', Carbon::today())
                                 ->first();
 
-            if (!$productSeen) {
-                ProductSeen::create([
-                    'id' => uuId(),
-                    'product_id' => $product->id,
-                    'user_id' => userId(),
-                ]);
-            }
+        if (!$productSeen) {
+            ProductSeen::create([
+                'id' => uuId(),
+                'product_id' => $product->id,
+                'user_id' => $userId,
+                'ip_address' => $_SERVER['REMOTE_HOST'],
+            ]);
         }
 
         userCreateLog("Has Visit Product $product->id");

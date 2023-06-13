@@ -42,7 +42,7 @@ class CheckoutController extends BaseController
         }
 
         // return $itemDetails
-        userCreateLog("Has Order $invoice");
+        userCreateLog("Order $invoice");
 
         $midtransClient = \Sawirricardo\Midtrans\Midtrans::make(
             "SB-Mid-server-HgNt5rGnmNKA-blTTc5qkpe1",

@@ -48,7 +48,7 @@ class ProductController extends BaseController
             ]);
         }
 
-        userCreateLog("Has Visit Product $product->id");
+        userCreateLog("Visit Product $product->slug");
 
         return new ResourcesProduct($product);
     }

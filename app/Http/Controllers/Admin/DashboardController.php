@@ -62,35 +62,21 @@ class DashboardController extends BaseController
             ],
         ];
 
-
         $procuctSeenToday = ProductSeen::whereDate('created_at', Carbon::today())->count();
         $procuctSeenYesterday = ProductSeen::whereDate('created_at', Carbon::yesterday())->count();
-        if ($procuctSeenToday == 0 && $procuctSeenYesterday == 0)
-            $productSeenStat = 0;
-        else
-            $productSeenStat = ($procuctSeenToday - $procuctSeenYesterday) / $procuctSeenYesterday * 100;
+        $productSeenStat = $this->persen($procuctSeenToday, $procuctSeenYesterday);
 
         $procuctCartToday = Chart::whereDate('created_at', Carbon::today())->count();
         $procuctCartYesterday = Chart::whereDate('created_at', Carbon::yesterday())->count();
-        if ($procuctCartToday == 0 && $procuctCartYesterday == 0)
-            $productCartStat = 0;
-        else
-            $productCartStat = ($procuctCartToday - $procuctCartYesterday) / $procuctCartYesterday * 100;
+        $productCartStat = $this->persen($procuctCartToday, $procuctCartYesterday);
 
         $procuctTransactionToday = Transaction::whereDate('created_at', Carbon::today())->whereIn('status_id', [2, 3, 4])->sum('qty');
         $procuctTransactionYesterday = Transaction::whereDate('created_at', Carbon::yesterday())->whereIn('status_id', [2, 3, 4])->sum('qty');
-        if ($procuctTransactionToday == 0 && $procuctTransactionYesterday == 0)
-            $productTransactionStat = 0;
-        else
-            $productTransactionStat = ($procuctTransactionToday - $procuctTransactionYesterday) / $procuctTransactionYesterday * 100;
+        $productTransactionStat = $this->persen($procuctTransactionToday, $procuctTransactionYesterday);
 
         $procuctTransactionPriceToday = Transaction::whereDate('created_at', Carbon::today())->whereIn('status_id', [2, 3, 4])->sum('total');
         $procuctTransactionPriceYesterday = Transaction::whereDate('created_at', Carbon::yesterday())->whereIn('status_id', [2, 3, 4])->sum('total');
-        if ($procuctTransactionPriceToday == 0 && $procuctTransactionPriceYesterday == 0)
-            $productTransactionPriceStat = 0;
-        else
-            $productTransactionPriceStat = ($procuctTransactionPriceToday - $procuctTransactionPriceYesterday) / $procuctTransactionPriceYesterday * 100;
-
+        $productTransactionPriceStat = $this->persen($procuctTransactionPriceToday, $procuctTransactionPriceYesterday);
 
         $colors = ['#2E93fA', '#0051a3', '#aadc8d', '#4caf50'];
         $labels = ['Produk Dilihat', 'Produk Dikeranjang', 'Produk Terjual', 'Potensi Penjualan'];
@@ -168,6 +154,18 @@ class DashboardController extends BaseController
         ];
 
         return response()->json($response, 200);
+    }
+
+    public function persen($today, $yesterday)
+    {
+        if ($today == 0 && $yesterday == 0)
+            $stat = 0;
+        else if($yesterday == 0)
+            $stat = 100;
+        else
+            $stat = ($today - $yesterday) / $yesterday * 100;
+
+        return $stat;
     }
 
 }

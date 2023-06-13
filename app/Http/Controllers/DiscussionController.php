@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller as BaseController;
 
@@ -29,16 +30,18 @@ class DiscussionController extends BaseController
     public function store(Request $request)
     {
         try{
+            $product = Product::find($request->product_id);
+
             $data = [
                 'id' => uuId(),
                 'parent' => $request->parent,
                 'user_id' => userId(),
-                'product_id' => $request->product_id,
+                'product_id' => $product->id,
                 'desc' => isset($request->desc_key) ? $request->desc_parent[$request->desc_key] : $request->desc,
             ];
             ProductDiscussion::create($data);
 
-            userCreateLog("Has Add Discussion Product $request->product_id");
+            userCreateLog("Add Discussion Product $product->slug");
 
             $response = [
                 'status' => 200,

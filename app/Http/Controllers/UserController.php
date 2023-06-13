@@ -105,7 +105,7 @@ class UserController extends BaseController
                                         ->where('status_id', 4)
                                         ->count();
 
-        userCreateLog('Has Visit Profile');
+        userCreateLog('Visit Profile');
         return $user;
         return response()->json(auth());
         return auth();

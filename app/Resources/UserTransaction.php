@@ -16,6 +16,7 @@ class UserTransaction extends JsonResource
             "avatar" => $this->avatar,
             "admin" => ($this->admin) ? true : false,
             "created_at" => $this->created_at,
+            "provider" => $this->provider,
             // "transactions" => $this->transactionSuccess,
             "transaction_success_total" => count($this->transactionSuccess),
             "transaction_success_total_price" => toRupiah($this->transactionSuccess->sum('total')),

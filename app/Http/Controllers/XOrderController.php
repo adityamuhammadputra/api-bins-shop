@@ -2,18 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\AssetStatus;
-use App\Models\Chart;
 use App\Models\Transaction;
 use App\Models\TransactionDetail;
 use App\Models\TransactionStatus;
-use App\Resources\Cart;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller as BaseController;
 
-
-class OrderController extends BaseController
+class XOrderController extends BaseController
 {
     public function index(Request $request)
     {

@@ -41,7 +41,8 @@ class UserController extends BaseController
             return $this->tokenLogin();
         } else {
             $user = User::create([
-                'g' => $request->sub,
+                'provider' => $request->provider,
+                'provider_id' => $request->provider_id,
                 'email' => $request->email,
                 'name' => $request->name,
                 'avatar' => $request->picture,

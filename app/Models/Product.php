@@ -75,6 +75,9 @@ class Product extends BaseModel
             if (request('sort') == 4) {
                 $query->orderBy('price', 'desc');
             }
+            if (request('sort') == 5) {
+                $query->orderBy('discount', 'desc');
+            }
         } else {
             $query->orderBy('updated_at', 'desc');
         }

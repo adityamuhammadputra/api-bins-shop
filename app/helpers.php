@@ -93,7 +93,9 @@ function toRupiah($val)
 
 function sendMail($data)
 {
-    Mail::to($data->to)->send(new SendEmail($data));
+    if ($data->to) {
+        Mail::to($data->to)->send(new SendEmail($data));
+    }
 }
 
 

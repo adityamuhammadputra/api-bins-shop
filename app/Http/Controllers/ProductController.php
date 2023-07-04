@@ -24,6 +24,7 @@ class ProductController extends BaseController
 
     public function show($slug)
     {
+        dd($_SERVER);
         $product = Product::with('productRatings', 'productDiscussios')
                         ->where('slug', $slug)
                         ->firstOrFail();

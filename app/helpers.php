@@ -98,7 +98,6 @@ function sendMail($data)
     }
 }
 
-
 function userCreateLog($desc)
 {
     $data = [
@@ -107,7 +106,7 @@ function userCreateLog($desc)
         'url' => request()->url(),
         'method' => request()->method(),
         'desc' => $desc,
-        'ip_address' => $_SERVER['REMOTE_HOST'],
+        'ip_address' => $_SERVER['REMOTE_ADDR'],
     ];
 
     UserLog::create($data);

@@ -24,8 +24,6 @@ class ProductController extends BaseController
 
     public function show(Request $request, $slug)
     {
-        dd(gethostbyaddr($_SERVER["REMOTE_ADDR"]));
-        dd($_SERVER);
         $product = Product::with('productRatings', 'productDiscussios')
                         ->where('slug', $slug)
                         ->firstOrFail();
@@ -37,7 +35,7 @@ class ProductController extends BaseController
 
         $productSeen = ProductSeen::where('product_id', $product->id)
                                 ->where('user_id', $userId)
-                                ->where('ip_address', $_SERVER['REMOTE_HOST'])
+                                ->where('ip_address', $_SERVER['REMOTE_ADDR'])
                                 ->whereDate('created_at', Carbon::today())
                                 ->first();
 
@@ -46,7 +44,7 @@ class ProductController extends BaseController
                 'id' => uuId(),
                 'product_id' => $product->id,
                 'user_id' => $userId,
-                'ip_address' => $_SERVER['REMOTE_HOST'],
+                'ip_address' => $_SERVER['REMOTE_ADDR'],
             ]);
         }
 

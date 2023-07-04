@@ -22,8 +22,9 @@ class ProductController extends BaseController
         return ResourcesProduct::collection($products);
     }
 
-    public function show($slug)
+    public function show(Request $request, $slug)
     {
+        dd(gethostbyaddr($_SERVER["REMOTE_ADDR"]));
         dd($_SERVER);
         $product = Product::with('productRatings', 'productDiscussios')
                         ->where('slug', $slug)

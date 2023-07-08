@@ -11,7 +11,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\TutorialController;
 use App\Http\Controllers\UserController;
-
+use App\Models\AssetStatus;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
@@ -104,6 +104,23 @@ Route::prefix('/v1/')->group(function () {
 
     });
 
+});
+
+Route::get('/test-mail', function(){
+    $assetStatus = AssetStatus::find(11);
+    $dataEmail = (object) [
+        'subject' => "#INV12321321, $assetStatus->name",
+        'to' => 'adityamuhammadputra@gmail.com',
+        'invoice' => '#INV12321321',
+        'user' => 'user()->name',
+        'price' => '100000',
+        'status_name' => $assetStatus->name,
+        'status_desc' => $assetStatus->desc_email,
+        'link' => "order/1",
+    ];
+    sendMail($dataEmail);
+
+    return response()->json('emial has send adityamuhammadputra@gmail.com', 200);
 });
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {

@@ -32,7 +32,7 @@ Hai {{ $data->user }}. <b>{{ $data->status_desc }}</b>
 <br>
 Klik tombol <b>lihat pesanan</b>, untuk melihat detail pesanan kamu<br>
 
-@component('mail::button', ['url' => 'https://bins.shop/' . $data->link,  'color' => 'red'])
+@component('mail::button', ['url' => 'https://binsshop.tech/' . $data->link,  'color' => 'red'])
 Lihat Pesanan
 @endcomponent
 

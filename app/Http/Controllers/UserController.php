@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\WelcomeEmail;
 use App\Models\AssetStatus;
 use App\Models\Transaction;
 use App\Models\User;
@@ -13,6 +14,7 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 
 class UserController extends BaseController
 {
@@ -43,11 +45,15 @@ class UserController extends BaseController
             $user = User::create([
                 'provider' => $request->provider,
                 'provider_id' => $request->provider_id,
-                'email' => $request->email,
+                'email' => $request->email ?? null,
                 'name' => $request->name,
                 'avatar' => $request->picture,
                 'password' => Hash::make('password'),
             ]);
+
+            if ($request->email && $request->name)
+                Mail::to($request->email)->send(new WelcomeEmail($request->name));
+
             return $this->tokenLogin();
         }
     }

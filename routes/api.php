@@ -32,9 +32,15 @@ use Illuminate\Support\Facades\Response;
 |
 */
 
+
 Route::prefix('/v1/')->group(function () {
+    Route::get('phpinfo', function(){
+        return phpinfo();
+    });
+
     Route::prefix('auth')->group(function () {
         Route::post('login', [UserController::class, 'login']);
+        Route::post('refresh', [UserController::class, 'refresh']);
 
         Route::group(['middleware' => 'jwt.verify'], function ($router) {
             Route::get('user', [UserController::class, 'user']);

@@ -90,9 +90,8 @@ class UserController extends BaseController
 
     protected function respondWithToken($token)
     {
-
         $user = auth()->user();
-        $user->setAppends([]); // kl gak gini, banyak atribut yg asumsi web-based (request(), session(), dll)
+        // $user->setAppends([]); // kl gak gini, banyak atribut yg asumsi web-based (request(), session(), dll)
 
 
         userCreateLog('Has Login');
@@ -103,6 +102,11 @@ class UserController extends BaseController
             'expiresIn' => auth()->factory()->getTTL() * 600,
             'user' => $user,
         ]);
+    }
+
+    public function refresh()
+    {
+        return $this->respondWithToken(auth()->refresh());
     }
 
     public function user(Request $request)

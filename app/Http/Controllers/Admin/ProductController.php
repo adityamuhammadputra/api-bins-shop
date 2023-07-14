@@ -11,6 +11,7 @@ use App\Resources\ProductMin;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use ImageVendor;
 
 class ProductController extends BaseController
 {
@@ -106,7 +107,14 @@ class ProductController extends BaseController
             $file = $request->file($name);
             // $originalName = $file->getClientOriginalName();
             $fileName = uuid() . '_' . $file->getClientOriginalName();
-            Storage::disk('public')->put($fileName, File::get($file));
+            $fileCompress = ImageVendor::make(File::get($file))->resize(500, 500,
+                                        function ($constraint) {
+                                            $constraint->aspectRatio();
+                                        })
+                                        ->resizeCanvas(500, 500)
+                                        ->encode('jpg',80);
+
+            Storage::disk('public')->put($fileName, $fileCompress);
             return $fileName;
         }
 

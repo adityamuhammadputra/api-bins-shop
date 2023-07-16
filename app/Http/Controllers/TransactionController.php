@@ -213,14 +213,12 @@ class TransactionController extends BaseController
                 'link' => "order/$id",
             ];
             sendMail($dataEmail);
+            userCreateLog("Order Create $invoice");
 
             $response = [
                 'status' => 200,
                 'message' => 'Pesanan berhasil dibuat',
             ];
-
-            userCreateLog("Order $invoice");
-
         }
         catch (\Exception $e) {
             $response = [

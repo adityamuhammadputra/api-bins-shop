@@ -23,7 +23,9 @@ class ProductDiscussion extends BaseModel
 
     public function children()
     {
-        return $this->hasMany(self::class, 'parent')->orderBy('created_at', 'asc');
+        return $this->hasMany(self::class, 'parent')
+                ->orderBy('created_at', 'asc')
+                ->whereHas('user');
     }
 
     public function scopeFiltered($query)

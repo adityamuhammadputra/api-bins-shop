@@ -14,6 +14,7 @@ class DiscussionController extends BaseController
     public function index(Request $request, $returnCount = false)
     {
         $data = ProductDiscussion::filtered()
+                    ->whereHas('user')
                     ->whereNull('parent')
                     ->orderBy('created_at', 'desc')
                     ->get();

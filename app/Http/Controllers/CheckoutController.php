@@ -41,9 +41,6 @@ class CheckoutController extends BaseController
             }
         }
 
-        // return $itemDetails
-        userCreateLog("Order $invoice");
-
         $midtransClient = \Sawirricardo\Midtrans\Midtrans::make(
             "SB-Mid-server-HgNt5rGnmNKA-blTTc5qkpe1",
             "SB-Mid-client-yZVknAlmsT3Cr3K8",
@@ -71,6 +68,8 @@ class CheckoutController extends BaseController
             'token' => $snapToken->token,
             'url' => $snapToken->redirect_url,
         ];
+
+        userCreateLog("Klik button Order ($invoice)");
         return response()->json($response, 200);
     }
 

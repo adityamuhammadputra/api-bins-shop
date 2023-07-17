@@ -80,6 +80,8 @@ class User extends Authenticatable implements JWTSubject
         if (request('admin')) {
             if (request('admin') == 1) {
                 $query->where('admin', 1);
+            } elseif(request('admin') == 3) {
+                $query->where('provider', 'random');
             } else {
                 $query->whereNull('admin');
             }

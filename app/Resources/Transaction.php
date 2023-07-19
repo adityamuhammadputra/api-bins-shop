@@ -21,7 +21,7 @@ class Transaction extends JsonResource
             "total_rp" => toRupiah($this->total),
             "notes" => $this->notes,
             "user_id" => $this->user_id,
-            "user" => $this->user,
+            "user" => new User($this->user),
             "transaction_midtrans" => [
                 'order_id' => $this->order_id,
                 'gross_amount' => $this->gross_amount,

@@ -25,7 +25,7 @@ class Product extends JsonResource
             "price_final_rp" => ($this->discount) ? toRupiah($this->price - ($this->price * $this->discount / 100)) : toRupiah($this->price),
             "sold" => ($this->sold) ? $this->sold : 0,
             "ratings" => ProductRating::collection($this->productRatings),
-            "rating_avg" => $this->productRatings->avg('rating'),
+            "rating_avg" => round($this->productRatings->avg('rating'), 2),
             "rating_count" => $this->productRatings->count(),
             "discussions" => ProductDiscussion::collection($this->productDiscussios),
             "category_id" => $this->category_id,

@@ -35,6 +35,12 @@ use Illuminate\Support\Facades\Response;
 
 Route::prefix('/v1/')->group(function () {
     Route::get('phpinfo', function(){
+        $uuIds = '';
+        foreach (range(1,20) as $value) {
+            $uuIds .= uuId() . '<br>';
+        }
+        return $uuIds;
+        return uuId();
         return phpinfo();
     });
 

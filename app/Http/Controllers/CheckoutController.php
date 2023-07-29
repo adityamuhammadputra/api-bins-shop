@@ -48,20 +48,20 @@ class CheckoutController extends BaseController
             false
         );
 
-        dd($midtransClient);
+        // dd($midtransClient);
         $snapToken = $midtransClient->snap()->create(new \Sawirricardo\Midtrans\Dto\TransactionDto([
                 'transaction_details' => [
                     'order_id' => $invoice,
                     'gross_amount' => $request->amount,
                 ],
-                "customer_details" => [
-                    "first_name" => user()->name,
-                    "phone" => user()->phone,
-                    "billing_address"=> [
-                        "address"=> user()->email ?? '-',
-                    ],
-                ],
-                "item_details" => $itemDetails,
+                // "customer_details" => [
+                //     "first_name" => user()->name,
+                //     "phone" => user()->phone,
+                //     "billing_address"=> [
+                //         "address"=> user()->email ?? '-',
+                //     ],
+                // ],
+                // "item_details" => $itemDetails,
                 "enabled_payments" => ['gopay', 'shopeepay', 'alfamart' ,'indomaret', 'bca_va', 'bri_va', 'bni_va', 'other_va', 'echannel', 'akulaku']
             ]));
 

@@ -15,7 +15,6 @@ class CheckoutController extends BaseController
 {
     public function store(Request $request)
     {
-
         $invoice = 'INV' . Carbon::now()->format('YmdHis');
 
         $itemDetails = [];
@@ -48,6 +47,8 @@ class CheckoutController extends BaseController
             true,
             false
         );
+
+        dd($midtransClient);
         $snapToken = $midtransClient->snap()->create(new \Sawirricardo\Midtrans\Dto\TransactionDto([
                 'transaction_details' => [
                     'order_id' => $invoice,
@@ -57,7 +58,7 @@ class CheckoutController extends BaseController
                     "first_name" => user()->name,
                     "phone" => user()->phone,
                     "billing_address"=> [
-                        "address"=> user()->email,
+                        "address"=> user()->email ?? '-',
                     ],
                 ],
                 "item_details" => $itemDetails,
@@ -69,7 +70,7 @@ class CheckoutController extends BaseController
             'url' => $snapToken->redirect_url,
         ];
 
-        userCreateLog("Klik button Order ($invoice)");
+        // userCreateLog("Klik button Order ($invoice)");
         return response()->json($response, 200);
     }
 

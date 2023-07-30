@@ -321,7 +321,7 @@ class TransactionController extends BaseController
     public function callback(Request $request)
     {
         try {
-            $serverKey = 'SB-Mid-server-HgNt5rGnmNKA-blTTc5qkpe1';
+            $serverKey = config('midtrans.sandbox_server_key');
             $hassed = hash('sha512', $request->order_id . $request->status_code . $request->gross_amount . $serverKey);
             if ($hassed == $request->signature_key) {
                 if (in_array($request->transaction_status, ['capture', 'settlement'])) {

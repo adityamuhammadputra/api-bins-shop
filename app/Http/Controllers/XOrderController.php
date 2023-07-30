@@ -77,8 +77,8 @@ class XOrderController extends BaseController
         }
 
         $midtransClient = \Sawirricardo\Midtrans\Midtrans::make(
-            "SB-Mid-server-HgNt5rGnmNKA-blTTc5qkpe1",
-            "SB-Mid-client-yZVknAlmsT3Cr3K8",
+            config('midtrans.sandbox_server_key'),
+            config('midtrans.sandbox_client_key'),
             false,
             false,
             false
@@ -106,8 +106,8 @@ class XOrderController extends BaseController
     public function show($orderId)
     {
         $midtransClient = \Sawirricardo\Midtrans\Midtrans::make(
-            "SB-Mid-server-HgNt5rGnmNKA-blTTc5qkpe1",
-            "SB-Mid-client-yZVknAlmsT3Cr3K8",
+            config('midtrans.sandbox_server_key'),
+            config('midtrans.sandbox_client_key'),
             false,
             false,
             false

@@ -26,6 +26,10 @@ class DashboardController extends BaseController
     {
         $transactions = Transaction::whereIn('status_id', [2, 3, 9])
                             ->get();
+
+
+        return $transactions;
+
         $dataDiscuss = $this->ctrDiscuss->index($request, true);
 
         $row1 = [
@@ -36,10 +40,11 @@ class DashboardController extends BaseController
                 'price' => toRupiah($transactions->where('status', 2)->sum('price')),
                 'icon' => 'mdi-emoticon-happy-outline',
                 'url' => 'transaction?status=1',
+                'q' => 'transaction?status=1',
             ],
             [
                 'color' => 'white',
-                'total' => $transactions->where('status', 2)->count(),
+                'total' => $transactions->where('status', 3)->count(),
                 'label' => 'Pesanan Dikirim',
                 'price' => toRupiah($transactions->where('status', 3)->sum('price')),
                 'icon' => 'mdi-sticker-emoji',

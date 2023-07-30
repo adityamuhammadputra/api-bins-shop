@@ -353,7 +353,7 @@ class TransactionController extends BaseController
                     ];
                     sendMail($dataEmail);
 
-                    userCreateLog("Order Pay $transaction->invoice");
+                    userCreateLog("Order Pay $transaction->invoice - $user->name");
 
                 }
             }

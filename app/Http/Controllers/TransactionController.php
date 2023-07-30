@@ -212,8 +212,8 @@ class TransactionController extends BaseController
                 'status_desc' => $assetStatus->desc_email,
                 'link' => "order/$id",
             ];
-            sendMail($dataEmail);
             userCreateLog("Order Create $invoice");
+            sendMail($dataEmail);
 
             $response = [
                 'status' => 200,

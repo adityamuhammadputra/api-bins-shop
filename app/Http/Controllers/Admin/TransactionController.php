@@ -50,6 +50,8 @@ class TransactionController extends BaseController
     public function update(Request $request, Transaction $transaction)
     {
         $status = $request->status;
+        if ($status == 2)
+            $msg= 'Pembayaran berhasil validasi';
         if ($status == 3)
             $msg= 'Pembayaran berhasil validasi';
         if ($status == 4)
@@ -76,6 +78,9 @@ class TransactionController extends BaseController
                 'status_desc' => $assetStatus->desc_email,
                 'link' => "order/$transaction->id",
             ];
+
+            if ($status == 3)
+                userCreateLog("Order Pay $transaction->invoice - By Admin");
             sendMail($dataEmail);
 
             $response = [

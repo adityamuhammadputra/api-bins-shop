@@ -73,18 +73,18 @@ class CheckoutController extends BaseController
         return response()->json($response, 200);
     }
 
-    public function show($orderId)
-    {
-        $midtransClient = \Sawirricardo\Midtrans\Midtrans::make(
-            config('midtrans.sandbox_server_key'),
-            config('midtrans.sandbox_client_key'),
-            config('midtrans.is_production'),
-            true,
-            false
-        );
+    // public function show($orderId)
+    // {
+    //     $midtransClient = \Sawirricardo\Midtrans\Midtrans::make(
+    //         config('midtrans.sandbox_server_key'),
+    //         config('midtrans.sandbox_client_key'),
+    //         config('midtrans.is_production'),
+    //         true,
+    //         false
+    //     );
 
-         $transactionStatus = $midtransClient->payment()->status($orderId);
+    //      $transactionStatus = $midtransClient->payment()->status($orderId);
 
-         return response()->json($transactionStatus, 200);
-    }
+    //      return response()->json($transactionStatus, 200);
+    // }
 }

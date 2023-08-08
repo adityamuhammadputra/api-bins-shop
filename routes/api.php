@@ -66,6 +66,10 @@ Route::prefix('/v1/')->group(function () {
     Route::group(['middleware' => 'jwt.verify'], function ($router) {
         Route::resource('checkout', CheckoutController::class)->only('store', 'show');
         Route::resource('order', TransactionController::class)->except('create', 'edit');
+
+        Route::post('order-signature', [TransactionController::class, 'signature']);
+
+
         Route::post('order-rating', [TransactionController::class, 'ratingStore']);
         // Route::get('order-rating', [ProductController::class, 'ratingGet']);
         Route::resource('discuss', DiscussionController::class);

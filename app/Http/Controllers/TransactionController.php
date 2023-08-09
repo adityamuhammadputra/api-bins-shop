@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\AssetStatus;
+use App\Models\Chart;
 use App\Models\Product;
 use App\Models\Transaction;
 use App\Models\TransactionDetail;
@@ -17,11 +18,17 @@ use App\Services\TripayService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller as BaseController;
-
+use Illuminate\Support\Facades\Response;
 
 class TransactionController extends BaseController
 {
 
+    private $tripayService;
+
+    public function __construct(TripayService $tripay)
+    {
+        $this->tripayService = $tripay;
+    }
 
     public function index(Request $request)
     {
@@ -82,56 +89,52 @@ class TransactionController extends BaseController
         return response()->json($response, $response['status']);
     }
 
+    public function paymentList()
+    {
+        return $this->tripayService->index();
+    }
+
     public function store(Request $request)
     {
         try {
-            // return $request;
-            $invoice = $request->midtrans['order_id'];
-            $paymentType = $request->midtrans['payment_type'];
+            $invoice = 'INV'. userId() . Carbon::now()->format('YmdHis');
+            $user = user();
+            $payment = $this->tripayService->store($request, $invoice);
+            $paymentType = $request->transaction['code'];
 
-            $paymentTimeout = Carbon::parse($request->midtrans['transaction_time'])
+            $paymentTimeout = Carbon::parse(Carbon::now())
                                     ->addHours(23)
                                     ->addMinutes(59)
                                     ->format('Y-m-d H:i:s');
-            if (in_array($paymentType, ['qris'])) {
-                $paymentTimeout = Carbon::parse($request->midtrans['transaction_time'])
-                                    ->addMinutes(29)
-                                    ->format('Y-m-d H:i:s');
-            }
+            // if (in_array($paymentType, ['qris'])) {
+            //     $paymentTimeout = Carbon::parse($request->transaction['transaction_time'])
+            //                         ->addMinutes(29)
+            //                         ->format('Y-m-d H:i:s');
+            // }
 
             $id = uuId();
             $total = ($request->discount) ? $request->amount - $request->amount * $request->discount / 100 : $request->amount;
             $inputTrans = [
                 'id' => $id,
-                'user_id' => userId(),
+                'user_id' => $user->id,
                 'status_id' => 1,
                 'invoice' => $invoice,
                 'qty' => $request->qty,
                 'price' => $request->amount,
                 'discount' => ($request->discount) ? $request->discount : 0,
                 'total' => $total,
+                'provider' => 'tripay',
                 'order_id' => $invoice,
-                'gross_amount' => $request->midtrans['gross_amount'],
-                'status_code' => $request->midtrans['status_code'],
-                'transaction_id' => $request->midtrans['transaction_id'],
-                'transaction_status' => $request->midtrans['transaction_status'],
-                'transaction_time' => $request->midtrans['transaction_time'],
+                'gross_amount' => $payment['data']['amount'],
+                'received_amount' => $payment['data']['amount_received'],
+                // 'status_code' => $request->transaction['status_code'],
+                'transaction_id' => $payment['data']['reference'],
+                'transaction_status' => $payment['data']['status'],
+                'transaction_time' => Carbon::now(),
                 'payment_type' => $paymentType,
                 'payment_timeout' => $paymentTimeout,
-                'payment_token' => $request->snapData,
+                // 'payment_token' => $request->snapData,
             ];
-
-            // dd($inputTrans);
-
-
-            Transaction::create($inputTrans);
-
-            TransactionStatus::create([
-                'id' => uuId(),
-                'user_id' => userId(),
-                'transaction_id' => $inputTrans['id'],
-                'status_id' => 1,
-            ]);
 
             $inputTransDetail = [];
 
@@ -144,7 +147,7 @@ class TransactionController extends BaseController
 
                 $inputTransDetail[] = [
                     'id' => uuId(),
-                    'user_id' => userId(),
+                    'user_id' => $user->id,
                     'transaction_id' => $inputTrans['id'],
                     'invoice' => $invoice,
                     'product_id' => $request->product['id'],
@@ -162,8 +165,11 @@ class TransactionController extends BaseController
                 $product->sold = isset($product->sold ) ? $product->sold + $request->qty : $request->qty;
                 $product->stock = $product->stock - $request->qty;
                 $product->save();
-            } else {
 
+                Chart::where('user_id', $user->id)
+                            ->where('product_id', $request->product['id'])
+                            ->delete();
+            } else {
                 // return $request->product;
                 foreach ($request->product as $key => $value) {
                     if (isset($value['status']) && $value['status'] == true) {
@@ -176,7 +182,7 @@ class TransactionController extends BaseController
 
                         $inputTransDetail[] = [
                             'id' => uuId(),
-                            'user_id' => userId(),
+                            'user_id' => $user->id,
                             'transaction_id' => $inputTrans['id'],
                             'invoice' => $invoice,
                             'product_id' => $value['product']['id'],
@@ -195,20 +201,34 @@ class TransactionController extends BaseController
                         $product->sold = isset($product->sold ) ? $product->sold + $value['qty'] : $value['qty'];
                         $product->stock = $product->stock - $value['qty'];
                         $product->save();
+
+                        Chart::where('user_id', $user->id)
+                            ->where('product_id', $value['product']['id'])
+                            ->delete();
                     }
                 }
             }
+
+            Transaction::create($inputTrans);
+
+            TransactionStatus::create([
+                'id' => uuId(),
+                'user_id' => $user->id,
+                'transaction_id' => $inputTrans['id'],
+                'status_id' => 1,
+            ]);
 
             if (count($inputTransDetail) > 0) {
                 TransactionDetail::insert($inputTransDetail);
             }
 
+
             $assetStatus = AssetStatus::find(1);
             $dataEmail = (object) [
                 'subject' => "#$invoice, $assetStatus->name",
-                'to' => user()->email,
+                'to' => $user->email ?? null,
                 'invoice' => $invoice,
-                'user' => user()->name,
+                'user' => $user->name,
                 'product' => $inputTransDetail,
                 'price' => toRupiah($total),
                 'payment_timeout' => dateTimeOutput2($paymentTimeout),
@@ -218,11 +238,7 @@ class TransactionController extends BaseController
             ];
             userCreateLog("Order Create $invoice");
             sendMail($dataEmail);
-
-            $response = [
-                'status' => 200,
-                'message' => 'Pesanan berhasil dibuat',
-            ];
+            return $payment;
         }
         catch (\Exception $e) {
             $response = [
@@ -234,11 +250,16 @@ class TransactionController extends BaseController
         return response()->json($response, 200);
     }
 
-    public function show($order)
+    public function show(Request $request, $order)
     {
+        if ($request->payload) {
+            $response = json_decode($this->tripayService->show($request->payload));
+            $response->data->icon_url = iconUrl($response->data->payment_method);
+            return $response;
+        }
         $data = Transaction::with('transactionStatuses', 'transactionStatuses.assetStatus')
-                ->where('id', $order)
-                ->firstOrFail();
+                    ->where('id', $order)
+                    ->firstOrFail();
 
         if ($data->payment_timeout < Carbon::now() && $data->status_id == 1) {
             $data->status_id = 11;
@@ -269,7 +290,6 @@ class TransactionController extends BaseController
 
     public function update(Request $request, Transaction $order)
     {
-
         $type = $request->type;
         if ($type == 'cancel') {
             $status = 12; $msg= 'Pesanan berhasil dibatalkan';
@@ -324,57 +344,107 @@ class TransactionController extends BaseController
 
     public function callback(Request $request)
     {
-        try {
-            $serverKey = config('midtrans.sandbox_server_key');
-            $hassed = hash('sha512', $request->order_id . $request->status_code . $request->gross_amount . $serverKey);
-            if ($hassed == $request->signature_key) {
-                if (in_array($request->transaction_status, ['capture', 'settlement'])) {
-                    $order = Transaction::where('order_id', $request->order_id);
-                    $order->update([
-                        'status_id' => 2,
-                        'transaction_status' => 'paid',
-                    ]);
+        $privateKey   = config('tripay.private_key');
 
-                    $transaction = Transaction::where('order_id', $request->order_id)->first();
-                    TransactionStatus::create([
-                        'id' => uuId(),
-                        'user_id' => $transaction->user_id,
-                        'transaction_id' => $transaction->id,
-                        'status_id' => 2,
-                    ]);
+        $callbackSignature = $request->server('HTTP_X_CALLBACK_SIGNATURE');
+        $json = $request->getContent();
+        $signature = hash_hmac('sha256', $json, $privateKey);
 
-                    $assetStatus = AssetStatus::find(2);
-                    $user = User::where('id', $transaction->user_id)->first();
-                    $dataEmail = (object) [
-                        'subject' => "#$transaction->invoice, $assetStatus->name",
-                        'to' => $user->email,
-                        'invoice' => $transaction->invoice,
-                        'user' => $user->name,
-                        'price' => toRupiah($transaction->total),
-                        'status_name' => $assetStatus->name,
-                        'status_desc' => $assetStatus->desc_email,
-                        'link' => "order/$transaction->id",
-                    ];
-                    sendMail($dataEmail);
-
-                    userCreateLog("Order Pay $transaction->invoice - $user->name");
-
-                }
-            }
-
-            $response = [
-                'status' => 200,
-                'message' => 'Pesanan dibayar',
-            ];
-        } catch (\Exception $e) {
-            $response = [
-                'status' => 503,
-                'message' => $e->getMessage()
-            ];
+        if ($signature !== (string) $callbackSignature) {
+            return Response::json([
+                'success' => false,
+                'message' => 'Invalid signature',
+            ]);
         }
 
-        return response()->json($response, 200);
+        if ('payment_status' !== (string) $request->server('HTTP_X_CALLBACK_EVENT')) {
+            return Response::json([
+                'success' => false,
+                'message' => 'Unrecognized callback event, no action was taken',
+            ]);
+        }
 
+        $data = json_decode($json);
+
+        if (JSON_ERROR_NONE !== json_last_error()) {
+            return Response::json([
+                'success' => false,
+                'message' => 'Invalid data sent by tripay',
+            ]);
+        }
+
+        $invoiceId = $data->merchant_ref;
+        $tripayReference = $data->reference;
+        $status = strtoupper((string) $data->status);
+
+        if ($data->is_closed_payment === 1) {
+            $transaction = Transaction::where('order_id', $invoiceId)
+                ->where('status', 'UNPAID')
+                ->first();
+
+            if (! $transaction) {
+                return Response::json([
+                    'success' => false,
+                    'message' => 'No invoice found or already paid: ' . $invoiceId,
+                ]);
+            }
+
+            if ($status == 'PAID') {
+                $transaction->update(['status_id' => 2, 'transaction_status' => 'PAID']);
+                TransactionStatus::create([
+                    'id' => uuId(),
+                    'user_id' => $transaction->user_id,
+                    'transaction_id' => $transaction->id,
+                    'status_id' => 2,
+                ]);
+
+                $assetStatus = AssetStatus::find(2);
+                $user = User::where('id', $transaction->user_id)->first();
+                $this->sendEmailCallback($transaction, $assetStatus, $user);
+
+                userCreateLog("Order Pay $transaction->invoice - $user->name");
+
+            } else if(in_array($status, ['EXPIRED', 'FAILED'])) {
+                $transaction->update(['status_id' => 11, 'transaction_status' => 'FAILED']);
+                TransactionStatus::create([
+                    'id' => uuId(),
+                    'user_id' => $transaction->user_id,
+                    'transaction_id' => $transaction->id,
+                    'status_id' => 11,
+                ]);
+
+                $assetStatus = AssetStatus::find(11);
+                $user = User::where('id', $transaction->user_id)->first();
+                $this->sendEmailCallback($transaction, $assetStatus, $user);
+                userCreateLog("Order Pay $transaction->invoice - $user->name");
+            } else {
+                return Response::json([
+                    'success' => false,
+                    'message' => 'Unrecognized payment status',
+                ]);
+            }
+            return Response::json(['success' => true]);
+        }
+    }
+
+    function sendEmailCallback($transaction, $assetStatus, $user)
+    {
+        $dataEmail = (object) [
+            'subject' => "#$transaction->invoice, $assetStatus->name",
+            'to' => $user->email,
+            'invoice' => $transaction->invoice,
+            'user' => $user->name,
+            'price' => toRupiah($transaction->total),
+            'status_name' => $assetStatus->name,
+            'status_desc' => $assetStatus->desc_email,
+            'link' => "order/$transaction->id",
+        ];
+        sendMail($dataEmail);
+    }
+
+    public function signature()
+    {
+        return json_encode($this->tripayService->signature());
     }
 
     public function ratingStore(Request $request)

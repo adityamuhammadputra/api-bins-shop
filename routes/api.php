@@ -40,7 +40,6 @@ Route::prefix('/v1/')->group(function () {
             $uuIds .= uuId() . '<br>';
         }
         return $uuIds;
-        return uuId();
         return phpinfo();
     });
 
@@ -64,15 +63,16 @@ Route::prefix('/v1/')->group(function () {
     Route::resource('chart', ChartController::class)->except('create', 'show');
 
     Route::group(['middleware' => 'jwt.verify'], function ($router) {
-        Route::resource('checkout', CheckoutController::class)->only('store', 'show');
-        Route::resource('order', TransactionController::class)->except('create', 'edit');
 
         Route::post('order-signature', [TransactionController::class, 'signature']);
-
+        Route::resource('order', TransactionController::class)->except('create', 'edit');
+        Route::get('payment-list', [TransactionController::class, 'paymentList']);
+        // Route::post('order-checkout', CheckoutController::class)->only('store', 'show');
 
         Route::post('order-rating', [TransactionController::class, 'ratingStore']);
         // Route::get('order-rating', [ProductController::class, 'ratingGet']);
         Route::resource('discuss', DiscussionController::class);
+
         // Route::get('checkout/{checkout_id}', [CheckoutController::class, 'show']);
         // Route::get('checkout/{checkout_id}', [CheckoutController::class, 'show']);
     });

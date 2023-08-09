@@ -24,10 +24,13 @@ class TransactionWithStatus extends JsonResource
             "total_rp" => toRupiah($this->total),
             "notes" => $this->notes,
             "user_id" => $this->user_id,
-            "transaction_midtrans" => [
+            "transaction_provider" => [
+                'provider' => $this->provider,
                 'order_id' => $this->order_id,
                 'gross_amount' => $this->gross_amount,
-                'status_code' => $this->status_code,
+                'received_amount' => $this->received_amount,
+                // 'status_code' => $this->status_code,
+                'transaction_id' => $this->transaction_id,
                 'transaction_status' => $this->transaction_status,
                 'transaction_time' => $this->transaction_time,
                 'payment_type' => $this->payment_type,

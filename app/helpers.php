@@ -111,3 +111,22 @@ function userCreateLog($desc)
 
     UserLog::create($data);
 }
+
+
+function iconUrl($code)
+{
+    $icons = [
+        'BNIVA' => 'https://assets.tripay.co.id/upload/payment-icon/n22Qsh8jMa1583433577.png',
+        'BRIVA' => 'https://assets.tripay.co.id/upload/payment-icon/8WQ3APST5s1579461828.png',
+        'MANDIRIVA' => 'https://assets.tripay.co.id/upload/payment-icon/T9Z012UE331583531536.png',
+        'BCAVA' => 'https://assets.tripay.co.id/upload/payment-icon/ytBKvaleGy1605201833.png',
+        'BSIVA' => 'https://assets.tripay.co.id/upload/payment-icon/tEclz5Assb1643375216.png',
+        'ALFAMART' => 'https://assets.tripay.co.id/upload/payment-icon/jiGZMKp2RD1583433506.png',
+        'INDOMARET' => 'https://assets.tripay.co.id/upload/payment-icon/zNzuO5AuLw1583513974.png',
+        'OVO' => 'https://assets.tripay.co.id/upload/payment-icon/fH6Y7wDT171586199243.png',
+        'QRISC' => 'https://assets.tripay.co.id/upload/payment-icon/m9FtFwaBCg1623157494.png',
+        'SHOPEEPAY' => 'https://assets.tripay.co.id/upload/payment-icon/d204uajhlS1655719774.png',
+    ];
+
+    return $icons[$code];
+}

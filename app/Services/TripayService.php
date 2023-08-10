@@ -84,7 +84,7 @@ class TripayService {
             'amount'         => $amount,
             'customer_name'  => $user->name,
             'customer_email' => $user->email ?? '',
-            'customer_phone' => $$user->phone ?? '',
+            'customer_phone' => $user->phone ?? '',
             'order_items' => $itemDetails,
             // 'order_items'    => [
             //     [

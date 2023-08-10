@@ -379,7 +379,7 @@ class TransactionController extends BaseController
 
         if ($data->is_closed_payment === 1) {
             $transaction = Transaction::where('order_id', $invoiceId)
-                ->where('status', 'UNPAID')
+                ->where('transaction_status', 'UNPAID')
                 ->first();
 
             if (! $transaction) {

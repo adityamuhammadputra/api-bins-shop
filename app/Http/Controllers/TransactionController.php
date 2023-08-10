@@ -344,7 +344,6 @@ class TransactionController extends BaseController
 
     public function callbackTripay(Request $request)
     {
-        return $request;
         $privateKey   = config('tripay.private_key');
 
         $callbackSignature = $request->server('HTTP_X_CALLBACK_SIGNATURE');

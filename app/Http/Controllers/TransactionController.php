@@ -139,9 +139,9 @@ class TransactionController extends BaseController
             $inputTransDetail = [];
 
             if ($request->direct) { //for button "beli langsung"
-                $totalDetail = (int)$request->product['price'];
+                $totalDetail = toInt($request->product['price']);
                 if (isset($request->product['discount'])) {
-                    $totalDisc = (int)$request->product['price'] * (int)$request->product['discount'] / 100;
+                    $totalDisc = toInt($request->product['price']) * toInt($request->product['discount']) / 100;
                     $totalDetail = $totalDetail - $totalDisc;
                 }
 
@@ -152,9 +152,9 @@ class TransactionController extends BaseController
                     'invoice' => $invoice,
                     'product_id' => $request->product['id'],
                     'product_name' => $request->product['name'],
-                    'price' => (int)$request->product['price'],
-                    'price_discount' => (int)$request->product['price_final'],
-                    'discount' => (int)$request->product['discount'],
+                    'price' => toInt($request->product['price']),
+                    'price_discount' => toInt($request->product['price_final']),
+                    'discount' => toInt($request->product['discount']),
                     'qty' => $request->qty,
                     'total' => $totalDetail * $request->qty,
                     'created_at' => Carbon::now(),
@@ -174,9 +174,9 @@ class TransactionController extends BaseController
                 foreach ($request->product as $key => $value) {
                     if (isset($value['status']) && $value['status'] == true) {
 
-                        $totalDetail = (int)$value['product']['price'];
+                        $totalDetail = toInt($value['product']['price']);
                         if (isset($value['product']['discount'])) {
-                            $totalDisc = (int)$value['product']['price'] * (int)$value['product']['discount'] / 100;
+                            $totalDisc = toInt($value['product']['price']) * toInt($value['product']['discount']) / 100;
                             $totalDetail = ($totalDetail - $totalDisc);
                         }
 
@@ -188,10 +188,10 @@ class TransactionController extends BaseController
                             'product_id' => $value['product']['id'],
                             'product_name' => $value['product']['name'],
                             'notes' => $value['notes'],
-                            'price' => (int)$value['product']['price'],
-                            'price_discount' => (int)$value['product']['price_final'],
+                            'price' => toInt($value['product']['price']),
+                            'price_discount' => toInt($value['product']['price_final']),
                             'qty' => $value['qty'],
-                            'discount' => (int)$value['product']['discount'],
+                            'discount' => toInt($value['product']['discount']),
                             'total' => $totalDetail * $value['qty'],
                             'created_at' => Carbon::now(),
                             'updated_at' => Carbon::now(),
@@ -342,7 +342,7 @@ class TransactionController extends BaseController
         return response()->json($response, 200);
     }
 
-    public function callback(Request $request)
+    public function callbackTripay(Request $request)
     {
         $privateKey   = config('tripay.private_key');
 

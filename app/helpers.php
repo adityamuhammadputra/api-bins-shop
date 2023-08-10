@@ -91,6 +91,11 @@ function toRupiah($val)
     return "Rp 0";
 }
 
+function toInt($val)
+{
+    return (int)str_replace(".","","$val");
+}
+
 function sendMail($data)
 {
     if ($data->to) {

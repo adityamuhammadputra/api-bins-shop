@@ -5,7 +5,6 @@ use App\Http\Controllers\Admin\DiscussionController as AdminDiscussionController
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\TransactionController as AdminTransactionController;
 use App\Http\Controllers\ChartController;
-use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\DiscussionController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\TransactionController;
@@ -67,19 +66,14 @@ Route::prefix('/v1/')->group(function () {
         Route::post('order-signature', [TransactionController::class, 'signature']);
         Route::resource('order', TransactionController::class)->except('create', 'edit');
         Route::get('payment-list', [TransactionController::class, 'paymentList']);
-        // Route::post('order-checkout', CheckoutController::class)->only('store', 'show');
 
         Route::post('order-rating', [TransactionController::class, 'ratingStore']);
         // Route::get('order-rating', [ProductController::class, 'ratingGet']);
         Route::resource('discuss', DiscussionController::class);
-
-        // Route::get('checkout/{checkout_id}', [CheckoutController::class, 'show']);
-        // Route::get('checkout/{checkout_id}', [CheckoutController::class, 'show']);
     });
 
     Route::get('tutorial', [TutorialController::class, 'index']);
-    Route::post('order-callback', [TransactionController::class, 'callback']);
-
+    Route::post('order-callback-tripay', [TransactionController::class, 'callbackTripay']);
 
     Route::get('/storage/{fileName}', function ($fileName) {
         if (!Storage::disk('public')->exists($fileName)) {

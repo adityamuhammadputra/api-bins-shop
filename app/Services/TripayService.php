@@ -18,6 +18,13 @@ class TripayService {
 
     function index()
     {
+        $response = [
+            'success' => true,
+            'message' => 'Success',
+            'data' => paymentListHardcode(),
+        ];
+        // dd($response);
+        return $response;
         $apiKey       = config('tripay.api_key');
 
         $curl = curl_init();
@@ -49,7 +56,7 @@ class TripayService {
                     if ($value->group == 'Convenience Store')
                         $value->group = '3.' . $value->group;
 
-                    if ($value->code == 'QRISC') {
+                    if (in_array($value->code, ['QRISC', 'QRIS2'])) {
                         $value->name = 'QRIS (Dana & Gopay)';
                         $value->icon_url = '/assets/images/qrisDanaGopay.png';
                     }
@@ -61,7 +68,7 @@ class TripayService {
                 $response = [
                     'success' => true,
                     'message' => 'Success',
-                    'data' => $values
+                    'data' => $values,
                 ];
                 // dd($response);
                 return $response;

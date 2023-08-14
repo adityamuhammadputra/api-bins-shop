@@ -114,11 +114,11 @@ class TransactionController extends BaseController
                                     ->addHours(23)
                                     ->addMinutes(59)
                                     ->format('Y-m-d H:i:s');
-            // if (in_array($paymentType, ['qris'])) {
-            //     $paymentTimeout = Carbon::parse($request->transaction['transaction_time'])
-            //                         ->addMinutes(29)
-            //                         ->format('Y-m-d H:i:s');
-            // }
+            if (str_contains($paymentType, 'QRIS')) {
+                $paymentTimeout = Carbon::now()
+                                    ->addMinutes(59)
+                                    ->format('Y-m-d H:i:s');
+            }
 
             $id = uuId();
             $total = ($request->discount) ? $request->amount - $request->amount * $request->discount / 100 : $request->amount;

@@ -129,9 +129,241 @@ function iconUrl($code)
         'ALFAMART' => 'https://assets.tripay.co.id/upload/payment-icon/jiGZMKp2RD1583433506.png',
         'INDOMARET' => 'https://assets.tripay.co.id/upload/payment-icon/zNzuO5AuLw1583513974.png',
         'OVO' => 'https://assets.tripay.co.id/upload/payment-icon/fH6Y7wDT171586199243.png',
-        'QRISC' => 'https://assets.tripay.co.id/upload/payment-icon/m9FtFwaBCg1623157494.png',
+        'QRIS2' => '/assets/images/qrisDanaGopay.png',
+        'QRISC' => '/assets/images/qrisDanaGopay.png',
         'SHOPEEPAY' => 'https://assets.tripay.co.id/upload/payment-icon/d204uajhlS1655719774.png',
     ];
 
     return $icons[$code];
+}
+
+function paymentListHardcode() {
+    return json_decode('{
+        "1.E-Wallet": {
+            "7": {
+                "group": "1.E-Wallet",
+                "code": "OVO",
+                "name": "OVO",
+                "type": "redirect",
+                "fee_merchant": {
+                    "flat": 0,
+                    "percent": 3
+                },
+                "fee_customer": {
+                    "flat": 0,
+                    "percent": 0
+                },
+                "total_fee": {
+                    "flat": 0,
+                    "percent": "3.00"
+                },
+                "minimum_fee": 1000,
+                "maximum_fee": null,
+                "icon_url": "https:\/\/assets.tripay.co.id\/upload\/payment-icon\/fH6Y7wDT171586199243.png",
+                "active": true
+            },
+            "8": {
+                "group": "1.E-Wallet",
+                "code": "QRIS2",
+                "name": "QRIS (Dana & Gopay)",
+                "type": "direct",
+                "fee_merchant": {
+                    "flat": 750,
+                    "percent": 0.7
+                },
+                "fee_customer": {
+                    "flat": 0,
+                    "percent": 0
+                },
+                "total_fee": {
+                    "flat": 750,
+                    "percent": "0.70"
+                },
+                "minimum_fee": null,
+                "maximum_fee": null,
+                "icon_url": "\/assets\/images\/qrisDanaGopay.png",
+                "active": true
+            },
+            "9": {
+                "group": "1.E-Wallet",
+                "code": "SHOPEEPAY",
+                "name": "ShopeePay",
+                "type": "redirect",
+                "fee_merchant": {
+                    "flat": 0,
+                    "percent": 3
+                },
+                "fee_customer": {
+                    "flat": 0,
+                    "percent": 0
+                },
+                "total_fee": {
+                    "flat": 0,
+                    "percent": "3.00"
+                },
+                "minimum_fee": 1000,
+                "maximum_fee": null,
+                "icon_url": "https:\/\/assets.tripay.co.id\/upload\/payment-icon\/d204uajhlS1655719774.png",
+                "active": true
+            }
+        },
+        "2.Virtual Account": [
+            {
+                "group": "2.Virtual Account",
+                "code": "BNIVA",
+                "name": "BNI Virtual Account",
+                "type": "direct",
+                "fee_merchant": {
+                    "flat": 4250,
+                    "percent": 0
+                },
+                "fee_customer": {
+                    "flat": 0,
+                    "percent": 0
+                },
+                "total_fee": {
+                    "flat": 4250,
+                    "percent": "0.00"
+                },
+                "minimum_fee": null,
+                "maximum_fee": null,
+                "icon_url": "https:\/\/assets.tripay.co.id\/upload\/payment-icon\/n22Qsh8jMa1583433577.png",
+                "active": true
+            },
+            {
+                "group": "2.Virtual Account",
+                "code": "BRIVA",
+                "name": "BRI Virtual Account",
+                "type": "direct",
+                "fee_merchant": {
+                    "flat": 4250,
+                    "percent": 0
+                },
+                "fee_customer": {
+                    "flat": 0,
+                    "percent": 0
+                },
+                "total_fee": {
+                    "flat": 4250,
+                    "percent": "0.00"
+                },
+                "minimum_fee": null,
+                "maximum_fee": null,
+                "icon_url": "https:\/\/assets.tripay.co.id\/upload\/payment-icon\/8WQ3APST5s1579461828.png",
+                "active": true
+            },
+            {
+                "group": "2.Virtual Account",
+                "code": "MANDIRIVA",
+                "name": "Mandiri Virtual Account",
+                "type": "direct",
+                "fee_merchant": {
+                    "flat": 4250,
+                    "percent": 0
+                },
+                "fee_customer": {
+                    "flat": 0,
+                    "percent": 0
+                },
+                "total_fee": {
+                    "flat": 4250,
+                    "percent": "0.00"
+                },
+                "minimum_fee": null,
+                "maximum_fee": null,
+                "icon_url": "https:\/\/assets.tripay.co.id\/upload\/payment-icon\/T9Z012UE331583531536.png",
+                "active": true
+            },
+            {
+                "group": "2.Virtual Account",
+                "code": "BCAVA",
+                "name": "BCA Virtual Account",
+                "type": "direct",
+                "fee_merchant": {
+                    "flat": 5500,
+                    "percent": 0
+                },
+                "fee_customer": {
+                    "flat": 0,
+                    "percent": 0
+                },
+                "total_fee": {
+                    "flat": 5500,
+                    "percent": "0.00"
+                },
+                "minimum_fee": null,
+                "maximum_fee": null,
+                "icon_url": "https:\/\/assets.tripay.co.id\/upload\/payment-icon\/ytBKvaleGy1605201833.png",
+                "active": true
+            },
+            {
+                "group": "2.Virtual Account",
+                "code": "BSIVA",
+                "name": "BSI Virtual Account",
+                "type": "direct",
+                "fee_merchant": {
+                    "flat": 4250,
+                    "percent": 0
+                },
+                "fee_customer": {
+                    "flat": 0,
+                    "percent": 0
+                },
+                "total_fee": {
+                    "flat": 4250,
+                    "percent": "0.00"
+                },
+                "minimum_fee": null,
+                "maximum_fee": null,
+                "icon_url": "https:\/\/assets.tripay.co.id\/upload\/payment-icon\/tEclz5Assb1643375216.png",
+                "active": true
+            }
+        ],
+        "3.Convenience Store": {
+            "5": {
+                "group": "3.Convenience Store",
+                "code": "ALFAMART",
+                "name": "Alfamart",
+                "type": "direct",
+                "fee_merchant": {
+                    "flat": 3500,
+                    "percent": 0
+                },
+                "fee_customer": {
+                    "flat": 0,
+                    "percent": 0
+                },
+                "total_fee": {
+                    "flat": 3500,
+                    "percent": "0.00"
+                },
+                "minimum_fee": null,
+                "maximum_fee": null,
+                "icon_url": "https:\/\/assets.tripay.co.id\/upload\/payment-icon\/jiGZMKp2RD1583433506.png",
+                "active": true
+            },
+            "6": {
+                "group": "3.Convenience Store",
+                "code": "INDOMARET",
+                "name": "Indomaret",
+                "type": "direct",
+                "fee_merchant": {
+                    "flat": 3500,
+                    "percent": 0
+                },
+                "fee_customer": {
+                    "flat": 0,
+                    "percent": 0
+                },
+                "total_fee": {
+                    "flat": 3500,
+                    "percent": "0.00"
+                },
+                "minimum_fee": null,
+                "maximum_fee": null,
+                "icon_url": "https:\/\/assets.tripay.co.id\/upload\/payment-icon\/zNzuO5AuLw1583513974.png",
+                "active": true
+            }
+        }
+    }');
 }

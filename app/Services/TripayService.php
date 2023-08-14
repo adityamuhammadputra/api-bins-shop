@@ -37,6 +37,40 @@ class TripayService {
 
         curl_close($curl);
 
+        if (empty($error)) {
+            $response = json_decode($response);
+            $values = [];
+            if (isset($response->data)) {
+                foreach ($response->data as $key => $value) {
+                    if ($value->group == 'E-Wallet')
+                        $value->group = '1.' . $value->group;
+                    if ($value->group == 'Virtual Account')
+                        $value->group = '2.' . $value->group;
+                    if ($value->group == 'Convenience Store')
+                        $value->group = '3.' . $value->group;
+
+                    if ($value->code == 'QRISC') {
+                        $value->name = 'QRIS (Dana & Gopay)';
+                        $value->icon_url = '/assets/images/qrisDanaGopay.png';
+                    }
+                    $values[$value->group][$key] = $value;
+                }
+
+                ksort($values, SORT_ASC);
+
+                $response = [
+                    'success' => true,
+                    'message' => 'Success',
+                    'data' => $values
+                ];
+                // dd($response);
+                return $response;
+            }
+
+        } else {
+            return $error;
+        }
+
         // echo empty($error) ? $response : $error;
 
         return ($response) ?  $response : $error;

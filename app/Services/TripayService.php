@@ -136,7 +136,7 @@ class TripayService {
             //         // 'image_url'   => 'https://tokokamu.com/product/nama-produk-2.jpg',
             //     ]
             // ],
-            // // 'return_url'   => 'https://domainanda.com/redirect',
+            'return_url'   => 'https://binsshop.tech/order',
             'expired_time' => (time() + (24 * 60 * 60)), // 24 jam
             'signature'    => hash_hmac('sha256', $merchantCode.$merchantRef.$amount, $privateKey)
         ];

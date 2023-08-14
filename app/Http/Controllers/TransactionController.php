@@ -96,7 +96,7 @@ class TransactionController extends BaseController
 
     public function store(Request $request)
     {
-        // try {
+        try {
             $invoice = 'INV'. userId() . Carbon::now()->format('YmdHis');
             $user = user();
             $payment = $this->tripayService->store($request, $invoice);
@@ -247,15 +247,15 @@ class TransactionController extends BaseController
             userCreateLog("Order Create $invoice");
             sendMail($dataEmail);
             return $payment;
-        // }
-        // catch (\Exception $e) {
-        //     $response = [
-        //         'status' => 503,
-        //         'message' => $e->getMessage()
-        //     ];
-        // }
+        }
+        catch (\Exception $e) {
+            $response = [
+                'status' => 503,
+                'message' => $e->getMessage()
+            ];
+        }
 
-        // return response()->json($response, 500);
+        return response()->json($response, 500);
     }
 
     public function show(Request $request, $order)

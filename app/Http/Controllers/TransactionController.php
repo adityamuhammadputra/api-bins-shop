@@ -410,7 +410,7 @@ class TransactionController extends BaseController
                 $user = User::where('id', $transaction->user_id)->first();
                 $this->sendEmailCallback($transaction, $assetStatus, $user);
 
-                userCreateLog("Order Pay $transaction->invoice - $user->name");
+                userCreateLog("Order PAID $transaction->invoice - $user->name");
 
             } else if(in_array($status, ['EXPIRED', 'FAILED'])) {
                 $transaction->update(['status_id' => 11, 'transaction_status' => 'FAILED']);
@@ -424,7 +424,7 @@ class TransactionController extends BaseController
                 $assetStatus = AssetStatus::find(11);
                 $user = User::where('id', $transaction->user_id)->first();
                 $this->sendEmailCallback($transaction, $assetStatus, $user);
-                userCreateLog("Order Pay $transaction->invoice - $user->name");
+                userCreateLog("Order EXPIRED - FAILED $transaction->invoice - $user->name");
             } else {
                 return Response::json([
                     'success' => false,

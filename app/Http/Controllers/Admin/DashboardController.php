@@ -230,6 +230,7 @@ class DashboardController extends BaseController
             'row4' => [
                 'logs' => UserLog::with('user')
                                 ->whereDate('created_at', Carbon::now())->limit(50)
+                                ->where('ip_address', '!=', $_SERVER['REMOTE_ADDR'])
                                 ->orderBy('created_at', 'desc')
                                 ->get(),
 

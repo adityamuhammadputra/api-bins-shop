@@ -19,6 +19,8 @@ class ProductController extends BaseController
                         ->sort()
                         ->paginate(50);
 
+        userCreateLog("Visit Product List");
+
         return ResourcesProduct::collection($products);
     }
 
